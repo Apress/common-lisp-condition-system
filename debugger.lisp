@@ -53,9 +53,11 @@
 (define-command :report (stream condition &optional (level *debug-level*))
   (format stream "~&;; Debugger level ~D entered on ~S:~%"
           level (type-of condition))
-  (let* ((report (princ-to-string condition))
-         (lines (split-sequence #\Newline report :remove-empty-subseqs t)))
-    (format stream "~&~{;; ~A~%~}" lines)))
+  (handler-case (let* ((report (princ-to-string condition))
+                       (lines (split-sequence #\Newline report
+                                              :remove-empty-subseqs t)))
+                  (format stream "~&~{;; ~A~%~}" lines))
+    (format stream "~&;; #<error printing condition>~%")))
 
 (define-command :condition (stream condition)
   (evaluate-command :eval stream condition condition))
