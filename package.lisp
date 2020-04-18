@@ -6,7 +6,6 @@
 
 (in-package #:portable-condition-system/install)
 
-;;; TODO verify all symbols are implemented
 (defmacro shadowed-symbols ()
   `(append
     '(;; Restarts and related functions
@@ -15,7 +14,9 @@
       ;; Condition-restart association
       #:with-condition-restarts
       ;; Restart macros
-      #:restart-case #:restart-bind #:with-simple-restart)
+      #:restart-case #:restart-bind #:with-simple-restart
+      ;; Standard restarts
+      #:abort #:continue #:muffle-warning #:store-value #:use-value)
     '(;; Defining and making conditions
       #:define-condition #:make-condition)
     '(;; Basic condition types
@@ -52,13 +53,11 @@
     '(;; Assertions
       #:assert #:check-type #:etypecase #:ctypecase #:ecase #:ccase
       ;; Condition signaling
-      #:signal #:warn #:cerror #:error #:cerror
+      #:*break-on-signals* #:signal #:warn #:cerror #:error #:cerror
       ;; Handler macros
       #:handler-case #:handler-bind #:ignore-errors)
     '(;; Debugger invocation
-      #:break #:*break-on-signals* #:invoke-debugger #:*debugger-hook*)
-    '(;; Standard restarts
-      #:abort #:continue #:muffle-warning #:store-value #:use-value)))
+      #:break #:invoke-debugger #:*debugger-hook*)))
 
 (defmacro generate-defpackages ()
   (let ((symbols (shadowed-symbols)))

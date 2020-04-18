@@ -266,7 +266,6 @@
       (format stream " with new value~P for ~{~S~^, ~}." (length names) names)
       (format stream ".")))
 
-;;; TODO optional extension: access old value
 (defun assert-prompt (name value)
   (cond
     ((y-or-n-p "The old value of ~S is ~S.~%~
@@ -412,7 +411,7 @@
          (multiple-value-call (lambda ,@(cdr no-error-case))
            (block ,normal-return
              (return-from ,error-return
-               (handler-case* (return-from ,normal-return ,form)
+               (handler-case (return-from ,normal-return ,form)
                  ,@other-cases))))))))
 
 ;;; HANDLER-CASE - :NO-ERROR not present
@@ -463,7 +462,7 @@
     (case no-error-case-count
       (0 (make-handler-case-without-no-error-case form cases))
       (1 (make-handler-case-with-no-error-case form cases))
-      (t (error "Multiple :NO-ERROR cases found in HANDLER-CASE*.")))))
+      (t (error "Multiple :NO-ERROR cases found in HANDLER-CASE.")))))
 
 ;;; IGNORE-ERRORS
 
