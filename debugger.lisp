@@ -44,11 +44,11 @@
 (define-command :eval (stream condition &optional form)
   (let ((level *debug-level*))
     (with-simple-restart (abort "Return to debugger level ~D." level)
-      (let* ((form (or form (read stream)))
-             (- form)
-             (values (multiple-value-list (eval form))))
+      (let* ((real-form (or form (read stream)))
+             (- real-form)
+             (values (multiple-value-list (eval real-form))))
         (format stream "~&~{~S~^~%~}" values)
-        values))))
+        (values values real-form)))))
 
 (define-command :report (stream condition &optional (level *debug-level*))
   (format stream "~&;; Debugger level ~D entered on ~S:~%"
@@ -57,7 +57,7 @@
                        (lines (split-sequence #\Newline report
                                               :remove-empty-subseqs t)))
                   (format stream "~&~{;; ~A~%~}" lines))
-    (format stream "~&;; #<error printing condition>~%")))
+    (error () (format stream "~&;; #<error while printing condition>~%"))))
 
 (define-command :condition (stream condition)
   (evaluate-command :eval stream condition condition))
@@ -120,15 +120,17 @@
 
 (defun read-eval-print-command (stream condition)
   (format t "~&[~D] Debug> "*debug-level*)
-  (let* ((thing (read stream))
-         (values (typecase thing
-                   (keyword (evaluate-command thing stream condition))
-                   (integer (evaluate-command :restart stream condition thing))
-                   (t (evaluate-command :eval stream condition thing)))))
-    (prog1 values
-      (shiftf /// // / values)
-      (shiftf *** ** * (first values))
-      (shiftf +++ ++ + thing))))
+  (let* ((thing (read stream)))
+    (multiple-value-bind (values actual-thing)
+        (typecase thing
+          (keyword (evaluate-command thing stream condition))
+          (integer (evaluate-command :restart stream condition thing))
+          (t (evaluate-command :eval stream condition thing)))
+      (unless actual-thing (setf actual-thing thing))
+      (prog1 values
+        (shiftf /// // / values)
+        (shiftf *** ** * (first values))
+        (shiftf +++ ++ + actual-thing)))))
 
 (defun standard-debugger (condition &optional (stream *debug-io*))
   (let ((*debug-level* (1+ *debug-level*)))
