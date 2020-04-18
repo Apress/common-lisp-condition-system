@@ -78,9 +78,9 @@ PORTABLE-CONDITION-SYSTEM> (tagbody :go
 [1] Debug> :restarts
 
 ;; Available restarts:
-;;  0 [ABORT] Abort.
-;;  1 [RETRY] Retry.
-;;  2 [FAIL ] Fail.
+;;  0: [ABORT] Abort.
+;;  1: [RETRY] Retry.
+;;  2: [FAIL ] Fail.
 [1] Debug> (error "recursive debugger")
 
 ;; Debugger level 2 entered on SIMPLE-ERROR:
@@ -89,18 +89,18 @@ PORTABLE-CONDITION-SYSTEM> (tagbody :go
 [2] Debug> :restarts
 
 ;; Available restarts:
-;;  0 [ABORT] Return to debugger level 1.
-;;  1 [ABORT] Abort.
-;;  2 [RETRY] Retry.
-;;  3 [FAIL ] Fail.
+;;  0: [ABORT] Return to debugger level 1.
+;;  1: [ABORT] Abort.
+;;  2: [RETRY] Retry.
+;;  3: [FAIL ] Fail.
 [2] Debug> 0
 
 [1] Debug> :restarts
 
 ;; Available restarts:
-;;  0 [ABORT] Abort.
-;;  1 [RETRY] Retry.
-;;  2 [FAIL ] Fail.
+;;  0: [ABORT] Abort.
+;;  1: [RETRY] Retry.
+;;  2: [FAIL ] Fail.
 [1] Debug> :eval (+ 2 2)
 
 4
