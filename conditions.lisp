@@ -5,7 +5,7 @@
 ;;; DEFINE-CONDITION
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
-  (defun define-condition-make-report-method (name report-option)
+  (defun make-condition-report-method (name report-option)
     (when report-option
       (let* ((condition (gensym "CONDITION"))
              (stream (gensym "STREAM"))
@@ -21,7 +21,7 @@
          (other-options (remove report-option options))
          (supertypes (or supertypes '(condition))))
     `(progn (defclass ,name ,supertypes ,direct-slots ,@other-options)
-            ,@(define-condition-make-report-method name report-option)
+            ,@(make-condition-report-method name report-option)
             ',name)))
 
 (defun make-condition (datum &rest args)
@@ -216,6 +216,11 @@
   (apply #'make-condition datum arguments))
 
 (defmethod coerce-to-condition ((datum string) arguments default-type name)
+  (make-condition default-type
+                  :format-control datum
+                  :format-arguments arguments))
+
+(defmethod coerce-to-condition ((datum function) arguments default-type name)
   (make-condition default-type
                   :format-control datum
                   :format-arguments arguments))
