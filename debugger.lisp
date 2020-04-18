@@ -68,11 +68,17 @@
         (invoke-restart-interactively restart)
         (format stream "~&;; There is no active ABORT restart.~%"))))
 
+(define-command :q (stream condition)
+  (evaluate-command :abort stream condition))
+
 (define-command :continue (stream condition)
   (let ((restart (find-restart 'continue condition)))
     (if restart
         (invoke-restart-interactively restart)
         (format stream "~&;; There is no active CONTINUE restart.~%"))))
+
+(define-command :c (stream condition)
+  (evaluate-command :c stream condition))
 
 (defun restart-max-name-length (restarts)
   (flet ((name-length (restart) (length (string (restart-name restart)))))
@@ -101,17 +107,17 @@
 ;;   *   **   ***   +   ++   +++   /   //   ///   -
 ;;
 ;; Available debugger commands:
-;;  :HELP         Show this text.
-;;  :EVAL <form>  Evaluate a form typed after the :EVAL command.
-;;  :REPORT       Report the condition the debugger was invoked with.
-;;  :CONDITION    Return the condition object the debugger was invoked with.
-;;  :RESTARTS     Print available restarts.
-;;  :RESTART <n>  Invoke a restart with the given number.
-;;  <n>           Invoke a restart with the given number.")
+;;  :HELP          Show this text.
+;;  :EVAL <form>   Evaluate a form typed after the :EVAL command.
+;;  :REPORT        Report the condition the debugger was invoked with.
+;;  :CONDITION     Return the condition object the debugger was invoked with.
+;;  :RESTARTS      Print available restarts.
+;;  :RESTART <n>   Invoke a restart with the given number.
+;;  <n>            Invoke a restart with the given number.")
   (when (find-restart 'abort condition)
-    (format stream "~&;;  :ABORT        Exit by calling #'ABORT.~%"))
+    (format stream "~&;;  :ABORT, :Q     Exit by calling #'ABORT.~%"))
   (when (find-restart 'continue condition)
-    (format stream "~&;;  :CONTINUE     Exit by calling #'CONTINUE.~%"))
+    (format stream "~&;;  :CONTINUE, :C  Exit by calling #'CONTINUE.~%"))
   (format stream "~&~
 ;;
 ;; Any non-keyword non-integer form is evaluated."))

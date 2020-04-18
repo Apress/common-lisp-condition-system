@@ -51,7 +51,6 @@ PORTABLE-CONDITION-SYSTEM> (tagbody :go
                                   (abort () :report "Abort.")
                                   (retry () :report "Retry." (go :go))
                                   (fail () :report "Fail."))))
-
 ;; Debugger level 1 entered on TYPE-ERROR:
 ;; The value
 ;;   42
@@ -65,14 +64,14 @@ PORTABLE-CONDITION-SYSTEM> (tagbody :go
 ;;   *   **   ***   +   ++   +++   /   //   ///   -
 ;;
 ;; Available debugger commands:
-;;  :HELP         Show this text.
-;;  :EVAL <form>  Evaluate a form typed after the :EVAL command.
-;;  :REPORT       Report the condition the debugger was invoked with.
-;;  :CONDITION    Return the condition object the debugger was invoked with.
-;;  :RESTARTS     Print available restarts.
-;;  :RESTART <n>  Invoke a restart with the given number.
-;;  <n>           Invoke a restart with the given number.
-;;  :ABORT        Exit by calling #'ABORT.
+;;  :HELP          Show this text.
+;;  :EVAL <form>   Evaluate a form typed after the :EVAL command.
+;;  :REPORT        Report the condition the debugger was invoked with.
+;;  :CONDITION     Return the condition object the debugger was invoked with.
+;;  :RESTARTS      Print available restarts.
+;;  :RESTART <n>   Invoke a restart with the given number.
+;;  <n>            Invoke a restart with the given number.
+;;  :ABORT, :Q     Exit by calling #'ABORT.
 ;;
 ;; Any non-keyword non-integer form is evaluated.
 [1] Debug> :restarts
@@ -81,10 +80,10 @@ PORTABLE-CONDITION-SYSTEM> (tagbody :go
 ;;  0: [ABORT] Abort.
 ;;  1: [RETRY] Retry.
 ;;  2: [FAIL ] Fail.
-[1] Debug> (error "recursive debugger")
+[1] Debug> (error "recursive debugger time")
 
 ;; Debugger level 2 entered on SIMPLE-ERROR:
-;; recursive debugger
+;; recursive debugger time
 ;; Type :HELP for available commands.
 [2] Debug> :restarts
 
@@ -95,31 +94,22 @@ PORTABLE-CONDITION-SYSTEM> (tagbody :go
 ;;  3: [FAIL ] Fail.
 [2] Debug> 0
 
-[1] Debug> :restarts
-
-;; Available restarts:
-;;  0: [ABORT] Abort.
-;;  1: [RETRY] Retry.
-;;  2: [FAIL ] Fail.
-[1] Debug> :eval (+ 2 2)
+[1] Debug> (+ 2 2)
 
 4
-[1] Debug> +
-
-(+ 2 2)
-[1] Debug> (+ 22 22)
+[1] Debug> :eval (+ 22 22)
 
 44
+[1] Debug> +
+
+(+ 22 22)
 [1] Debug> ***
 
 4
-[1] Debug> **
-
-44
-[1] Debug> :abort
+[1] Debug> :q
 
 NIL
-PORTABLE-CONDITION-SYSTEM>
+PORTABLE-CONDITION-SYSTEM> 
 ```
 
 ## License
