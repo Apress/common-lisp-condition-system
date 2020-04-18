@@ -1,6 +1,5 @@
 ;;;; package.lisp
 
-
 (defpackage #:portable-condition-system/install
   (:use :cl))
 
@@ -72,5 +71,3 @@
          (:reexport #:portable-condition-system #:common-lisp)))))
 
 (generate-defpackages)
-
-(in-package #:portable-condition-system)

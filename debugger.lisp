@@ -6,13 +6,18 @@
 
 (defvar *debugger-hook* nil)
 
-(defun invoke-debugger (&optional (datum "Debug") &rest arguments)
-  (let ((condition
-          (coerce-to-condition datum arguments 'simple-condition 'debug)))
-    (when *debugger-hook*
-      (let ((hook *debugger-hook*)
-            (*debugger-hook* nil))
-        (funcall hook condition hook)))
+(defgeneric invoke-debugger (datum))
+
+(defmethod invoke-debugger ((condition condition))
+  (when *debugger-hook*
+    (let ((hook *debugger-hook*)
+          (*debugger-hook* nil))
+      (funcall hook condition hook)))
+  (standard-debugger condition))
+
+(defmethod invoke-debugger (datum)
+  (let* ((datum (or datum "Debug"))
+         (condition (coerce-to-condition datum '() 'simple-condition 'debug)))
     (standard-debugger condition)))
 
 (defun break (&optional (format-control "Break") &rest format-arguments)
@@ -60,7 +65,7 @@
     (error () (format stream "~&;; #<error while printing condition>~%"))))
 
 (define-command :condition (stream condition)
-  (evaluate-command :eval stream condition condition))
+  (run-debugger-command :eval stream condition condition))
 
 (define-command :abort (stream condition)
   (let ((restart (find-restart 'abort condition)))
@@ -69,7 +74,7 @@
         (format stream "~&;; There is no active ABORT restart.~%"))))
 
 (define-command :q (stream condition)
-  (evaluate-command :abort stream condition))
+  (run-debugger-command :abort stream condition))
 
 (define-command :continue (stream condition)
   (let ((restart (find-restart 'continue condition)))
@@ -78,7 +83,7 @@
         (format stream "~&;; There is no active CONTINUE restart.~%"))))
 
 (define-command :c (stream condition)
-  (evaluate-command :c stream condition))
+  (run-debugger-command :c stream condition))
 
 (defun restart-max-name-length (restarts)
   (flet ((name-length (restart) (length (string (restart-name restart)))))
@@ -132,9 +137,9 @@
   (let* ((thing (read stream)))
     (multiple-value-bind (values actual-thing)
         (typecase thing
-          (keyword (evaluate-command thing stream condition))
-          (integer (evaluate-command :restart stream condition thing))
-          (t (evaluate-command :eval stream condition thing)))
+          (keyword (run-debugger-command thing stream condition))
+          (integer (run-debugger-command :restart stream condition thing))
+          (t (run-debugger-command :eval stream condition thing)))
       (unless actual-thing (setf actual-thing thing))
       (prog1 values
         (shiftf /// // / values)
@@ -143,6 +148,6 @@
 
 (defun standard-debugger (condition &optional (stream *debug-io*))
   (let ((*debug-level* (1+ *debug-level*)))
-    (evaluate-command :report stream condition *debug-level*)
+    (run-debugger-command :report stream condition *debug-level*)
     (format stream "~&;; Type :HELP for available commands.~%")
     (loop (read-eval-print-command stream condition))))
