@@ -19,6 +19,12 @@
       #:abort #:continue #:muffle-warning #:store-value #:use-value)
     '(;; Defining and making conditions
       #:define-condition #:make-condition)
+    '(;; Assertions
+      #:assert #:check-type #:etypecase #:ctypecase #:ecase #:ccase
+      ;; Condition signaling
+      #:*break-on-signals* #:signal #:warn #:cerror #:error #:cerror
+      ;; Handler macros
+      #:handler-case #:handler-bind #:ignore-errors)
     '(;; Basic condition types
       #:condition #:warning #:serious-condition #:error
       ;; Simple condition
@@ -50,12 +56,6 @@
       #:file-error #:file-error-pathname
       ;; Print not readable
       #:print-not-readable #:print-not-readable-object)
-    '(;; Assertions
-      #:assert #:check-type #:etypecase #:ctypecase #:ecase #:ccase
-      ;; Condition signaling
-      #:*break-on-signals* #:signal #:warn #:cerror #:error #:cerror
-      ;; Handler macros
-      #:handler-case #:handler-bind #:ignore-errors)
     '(;; Debugger invocation
       #:break #:invoke-debugger #:*debugger-hook*)))
 

@@ -10,6 +10,7 @@
   :components ((:file "package")
                (:file "restarts")
                (:file "conditions")
+               (:file "condition-definitions")
                (:file "debugger")))
 
 ;;; TODO integration system

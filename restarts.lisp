@@ -147,8 +147,10 @@
 (defun restart-case-make-restart-binding (temp-var datum)
   (destructuring-bind (name tag keys lambda-list body) datum
     (declare (ignore lambda-list body))
-    (let ((temp-var (gensym "RESTART-ARGS")))
-      `(,name (lambda (&rest temp) (setq ,temp-var temp) (go ,tag)) ,@keys))))
+    (let ((lambda-var (gensym "RESTART-ARGS")))
+      `(,name
+        (lambda (&rest ,lambda-var) (setq ,temp-var ,lambda-var) (go ,tag))
+        ,@keys))))
 
 (defun restart-case-make-restart-case (block-tag temp-var datum)
   (destructuring-bind (name tag keys lambda-list body) datum
