@@ -32,7 +32,7 @@
 
 ;;; Host restarts
 
-(defstruct (cl-restart (:include portable-condition-system:restart))
+(defstruct (cl-restart (:include restart))
   (:wrapped-restart (error "WRAPPED-RESTART required.")))
 
 (defmethod invoke-restart ((restart cl-restart) &rest arguments)
