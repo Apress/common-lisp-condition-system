@@ -116,7 +116,7 @@
   ((object :reader print-not-readable-object :initarg :object))
   (:default-initargs :object (error "OBJECT required.")))
 
-;;; Custom condition types
+;;; Non-standard condition types
 
 (define-condition restart-not-found (control-error)
   ((restart-name :reader restart-not-found-restart-name :initarg :restart-name))

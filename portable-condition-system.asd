@@ -7,6 +7,7 @@
   :license  "CC0"
   :version "0.0.1"
   :serial t
+  :depends-on (#:split-sequence)
   :components ((:file "package")
                (:file "restarts")
                (:file "conditions")

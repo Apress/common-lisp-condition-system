@@ -64,6 +64,7 @@
     `(progn
        (uiop:define-package #:portable-condition-system
          (:use #:common-lisp)
+         (:import-from #:split-sequence #:split-sequence)
          (:shadow ,@symbols)
          (:export ,@symbols))
        (uiop:define-package #:common-lisp+portable-condition-system
