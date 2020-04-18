@@ -26,7 +26,7 @@ The original comment from by Kent states:
 
 This system has been created as a part of the efforts behind my upcoming book, *Common Lisp Condition System*. It is meant to be educational material for people who want to see how to implement a condition system from scratch. Additionally, it may be used for Common Lisp implementations which do not have a condition system themselves and would nonetheless like to adopt.
 
-The debugger itself is roughly extensible by means of defining new methods on the internal `run-debugger-command` generic function and pushing help-printing hooks onto `*help-hooks*`. See `debugger.lisp` for details.
+The debugger itself is roughly extensible by means of defining new methods on the internal `run-debugger-command` generic function and pushing help-printing hooks onto `*help-hooks*`. See [`debugger.lisp`](debugger.lisp) for details.
 
 ## Integration
 
