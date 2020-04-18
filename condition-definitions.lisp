@@ -34,8 +34,12 @@
 (define-condition storage-condition (serious-condition) ())
 
 (defun report-type-error (condition stream)
-  (format stream "The value ~S is not of type ~S."
-          (type-error-datum condition) (type-error-expected-type condition)))
+  (format stream "~@<The value ~
+                      ~@:_~2@T~S ~
+                      ~@:_is not of type ~
+                      ~@:_~2@T~S.~:@>"
+          (type-error-datum condition)
+          (type-error-expected-type condition)))
 
 (define-condition type-error (error)
   ((datum :reader type-error-datum :initarg :datum)

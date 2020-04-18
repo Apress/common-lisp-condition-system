@@ -47,7 +47,7 @@
       (let* ((form (or form (read stream)))
              (- form)
              (values (multiple-value-list (eval form))))
-        (format stream "~{~S~^~%~}" values)
+        (format stream "~&~{~S~^~%~}" values)
         values))))
 
 (define-command :report (stream condition &optional (level *debug-level*))
