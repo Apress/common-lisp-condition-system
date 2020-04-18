@@ -151,7 +151,18 @@
   ((object :reader print-not-readable-object :initarg :object))
   (:default-initargs :object (error "OBJECT required.")))
 
-;;; Continuable ssertions - utilities
+;;; Custom condition types
+
+(define-condition restart-not-found (control-error)
+  (restart-name)
+  (:report (lambda (condition stream)
+             (format stream "Restart ~S is not active."
+                     (restart-not-found-restart-name condition)))))
+
+(define-condition abort-failure (control-error) ()
+  (:report "An ABORT restart failed to transfer control."))
+
+;;; Continuable assertions - utilities
 
 (defun read-evaluated-form ()
   (format *query-io* "~&Type a form to be evaluated:~%")
