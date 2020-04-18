@@ -58,14 +58,13 @@ PORTABLE-CONDITION-SYSTEM> (tagbody :go
 ;;   *   **   ***   +   ++   +++   /   //   ///   -
 ;;
 ;; Available debugger commands:
-;;  :HELP          Show this text.
-;;  :EVAL <form>   Evaluate a form typed after the :EVAL command.
-;;  :REPORT        Report the condition the debugger was invoked with.
-;;  :CONDITION     Return the condition object the debugger was invoked with.
-;;  :RESTARTS      Print available restarts.
-;;  :RESTART <n>   Invoke a restart with the given number.
-;;  <n>            Invoke a restart with the given number.
-;;  :ABORT, :Q     Exit by calling #'ABORT.
+;;  :HELP              Show this text.
+;;  :EVAL <form>       Evaluate a form typed after the :EVAL command.
+;;  :REPORT            Report the condition the debugger was invoked with.
+;;  :CONDITION         Return the condition object the debugger was invoked with.
+;;  :RESTARTS          Print available restarts.
+;;  :RESTART <n>, <n>  Invoke a restart with the given number.
+;;  :ABORT, :Q         Exit by calling #'ABORT.
 ;;
 ;; Any non-keyword non-integer form is evaluated.
 [1] Debug> :restarts

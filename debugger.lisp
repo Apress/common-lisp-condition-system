@@ -109,17 +109,16 @@
 ;;   *   **   ***   +   ++   +++   /   //   ///   -
 ;;
 ;; Available debugger commands:
-;;  :HELP          Show this text.
-;;  :EVAL <form>   Evaluate a form typed after the :EVAL command.
-;;  :REPORT        Report the condition the debugger was invoked with.
-;;  :CONDITION     Return the condition object the debugger was invoked with.
-;;  :RESTARTS      Print available restarts.
-;;  :RESTART <n>   Invoke a restart with the given number.
-;;  <n>            Invoke a restart with the given number.")
+;;  :HELP              Show this text.
+;;  :EVAL <form>       Evaluate a form typed after the :EVAL command.
+;;  :REPORT            Report the condition the debugger was invoked with.
+;;  :CONDITION         Return the condition the debugger was invoked with.
+;;  :RESTARTS          Print available restarts.
+;;  :RESTART <n>, <n>  Invoke a restart with the given number.")
   (when (find-restart 'abort condition)
-    (format stream "~&;;  :ABORT, :Q     Exit by calling #'ABORT.~%"))
+    (format stream "~&;;  :ABORT, :Q         Exit by calling #'ABORT.~%"))
   (when (find-restart 'continue condition)
-    (format stream "~&;;  :CONTINUE, :C  Exit by calling #'CONTINUE.~%"))
+    (format stream "~&;;  :CONTINUE, :C      Exit by calling #'CONTINUE.~%"))
   (dolist (hook *help-hooks*)
     (funcall hook stream condition))
   (format stream "~&~
