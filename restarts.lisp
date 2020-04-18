@@ -45,31 +45,36 @@
                  (restart-visible-p restart condition))
         (return-from find-restart restart)))))
 
-(defun invoke-restart (restart &rest arguments)
-  (let ((real-restart
-          (cond ((typep restart 'restart)
-                 restart)
-                ((symbolp restart)
-                 (or (find-restart restart)
-                     (error "Restart ~S is not active." restart)))
-                (t
-                 (error "Wrong thing passed to INVOKE-RESTART: ~S" restart)))))
-    (apply (restart-function real-restart) arguments)))
+(defgeneric invoke-restart (restart &rest arguments))
 
-(defun invoke-restart-interactively (restart)
-  (let ((real-restart
-          (cond ((typep restart 'restart)
-                 restart)
-                ((symbolp restart)
-                 (or (find-restart restart)
-                     (error "Restart ~S is not active." restart)))
-                (t
-                 (error "Wrong thing passed to INVOKE-RESTART: ~S" restart)))))
-    (let* ((interactive-function (restart-interactive-function real-restart))
-           (arguments (if interactive-function
-                          (funcall interactive-function)
-                          '())))
-      (apply (restart-function real-restart) arguments))))
+(defmethod invoke-restart (restart &rest arguments)
+  (declare (ignore arguments))
+  (error "Wrong thing passed to INVOKE-RESTART: ~S" restart))
+
+(defmethod invoke-restart ((restart symbol) &rest arguments)
+  (let ((real-restart (or (find-restart restart)
+                          (error "Restart ~S is not active." restart))))
+    (apply #'invoke-restart real-restart arguments)))
+
+(defmethod invoke-restart ((restart restart) &rest arguments)
+  (apply (restart-function restart) arguments))
+
+(defgeneric invoke-restart-interactively (restart))
+
+(defmethod invoke-restart-interactively (restart)
+  (error "Wrong thing passed to INVOKE-RESTART-INTERACTIVELY: ~S" restart))
+
+(defmethod invoke-restart-interactively ((restart symbol))
+  (let ((real-restart (or (find-restart restart)
+                          (error "Restart ~S is not active." restart))))
+    (invoke-restart-interactively real-restart)))
+
+(defmethod invoke-restart-interactively ((restart restart))
+  (let* ((interactive-function (restart-interactive-function restart))
+         (arguments (if interactive-function
+                        (funcall interactive-function)
+                        '())))
+    (apply (restart-function restart) arguments)))
 
 ;;; RESTART-BIND
 

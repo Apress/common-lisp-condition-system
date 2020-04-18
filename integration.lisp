@@ -3,7 +3,8 @@
 (uiop:define-package #:portable-condition-system/integration
   (:use #:common-lisp+portable-condition-system
         #:trivial-custom-debugger)
-  (:export #:install))
+  (:export #:debugger
+           #:install))
 
 (in-package #:portable-condition-system/integration)
 
@@ -29,16 +30,68 @@
                 (cl:condition 'foreign-condition))))
     (make-condition type :condition condition)))
 
+;;; Host restarts
+
+(defstruct (cl-restart (:include portable-condition-system:restart))
+  (:wrapped-restart (error "WRAPPED-RESTART required.")))
+
+(defmethod invoke-restart ((restart cl-restart) &rest arguments)
+  (cl:invoke-restart (cl-restart-wrapped-restart restart) arguments))
+
+(defmethod invoke-restart-interactively ((restart cl-restart))
+  (cl:invoke-restart-interactively (cl-restart-wrapped-restart restart)))
+
+(defun cl-restart-to-pcs (cl-restart)
+  (make-cl-restart
+   :name (cl:restart-name cl-restart)
+   :function (lambda (&rest args) (apply #'cl:invoke-restart cl-restart args))
+   :report-function (lambda (stream) (princ cl-restart stream))
+   :wrapped-restart cl-restart))
+
+(defun call-with-host-restarts (cl-condition thunk)
+  (let* ((cl-restarts (cl:compute-restarts cl-condition))
+         (restarts (mapcar #'cl-restart-to-pcs cl-restarts))
+         (portable-condition-system::*restart-clusters*
+           (append portable-condition-system::*restart-clusters*
+                   (list restarts))))
+    (funcall thunk)))
+
+(defmacro with-host-restarts ((condition) &body body)
+  `(call-with-host-restarts ,condition (lambda () ,@body)))
+
+;;; Debugger commands
+
+(defmethod portable-condition-system::run-debugger-command :around
+    ((command (eql :abort)) stream condition &rest arguments)
+  (declare (ignore arguments))
+  (let* ((restarts (compute-restarts condition))
+         (restart (find-if (lambda (x) (member x '(cl:abort abort)))
+                           restarts :key #'restart-name)))
+    (if restart
+        (invoke-restart-interactively restart)
+        (format stream "~&;; There is no active ABORT restart.~%"))))
+
+(defmethod portable-condition-system::run-debugger-command :around
+    ((command (eql :continue)) stream condition &rest arguments)
+  (declare (ignore arguments))
+  (let* ((restarts (compute-restarts condition))
+         (restart (find-if (lambda (x) (member x '(cl:continue continue)))
+                           restarts :key #'restart-name)))
+    (if restart
+        (invoke-restart-interactively restart)
+        (format stream "~&;; There is no active CONTINUE restart.~%"))))
+
 ;;; Integration
 
 (defun debugger (condition hook)
   (let ((*debugger-hook* hook))
     (invoke-debugger condition)))
 
-(defmethod invoke-debugger ((condition cl:condition))
-  (let ((condition (cl-condition-to-pcs condition)))
+(defmethod invoke-debugger ((cl-condition cl:condition))
+  (let ((condition (cl-condition-to-pcs cl-condition)))
     (signal condition)
-    (portable-condition-system::standard-debugger condition)))
+    (with-host-restarts (cl-condition)
+      (portable-condition-system::standard-debugger condition))))
 
 (defun install ()
   (install-debugger #'invoke-debugger-hook))

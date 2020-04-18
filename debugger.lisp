@@ -95,7 +95,7 @@
         with max-name-length = (restart-max-name-length restarts)
         for i from 0
         for restart in restarts
-        do (format stream ";; ~2,' D: [~vS] ~A~%"
+        do (format stream ";; ~2,' D: [~vA] ~A~%"
                    i max-name-length (restart-name restart) restart)))
 
 (define-command :restart (stream condition &optional n)
