@@ -25,7 +25,7 @@
 
 ;;; DEFINE-COMMAND
 
-(defgeneric evaluate-command (command stream condition &rest arguments)
+(defgeneric run-debugger-command (command stream condition &rest arguments)
   (:method (command stream condition &rest arguments)
     (declare (ignore arguments))
     (format stream "~&;; Unknown command: ~S~%" command)))
@@ -33,7 +33,7 @@
 (defmacro define-command (name (stream condition &rest arguments) &body body)
   (let ((command (gensym "COMMAND"))
         (arguments-var (gensym "ARGUMENTS")))
-    `(defmethod evaluate-command
+    `(defmethod run-debugger-command
          ((,command (eql ,name)) ,stream ,condition &rest ,arguments-var)
        (destructuring-bind ,arguments ,arguments-var ,@body))))
 
@@ -100,6 +100,8 @@
         (invoke-restart-interactively restart)
         (format stream "~&;; There is no restart with number ~D." n))))
 
+(defvar *help-hooks* '())
+
 (define-command :help (stream condition)
   (format stream "~&~
 ;; This is the standard debugger of the Portable Condition System.
@@ -118,6 +120,8 @@
     (format stream "~&;;  :ABORT, :Q     Exit by calling #'ABORT.~%"))
   (when (find-restart 'continue condition)
     (format stream "~&;;  :CONTINUE, :C  Exit by calling #'CONTINUE.~%"))
+  (dolist (hook *help-hooks*)
+    (funcall hook stream condition))
   (format stream "~&~
 ;;
 ;; Any non-keyword non-integer form is evaluated."))

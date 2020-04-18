@@ -29,7 +29,11 @@ The original comment from by Kent states:
 ;;; in that loading this file will not redefine your condition system. Loading this
 ;;; file will define a bunch of functions which work like a condition system. Redefining
 ;;; existing condition systems is beyond the goal of this implementation attempt.
-``**
+```
+
+This system has been created as a part of the efforts behind my upcoming book, *Common Lisp Condition System*. It is meant to be educational material for people who want to see how to implement a condition system from scratch. Additionally, it may be used for Common Lisp implementations which do not have a condition system themselves and would nonetheless like to adopt.
+
+The debugger itself is roughly extensible by means of defining new methods on the internal `run-debugger-command` generic function and pushing help-printing hooks onto `*help-hooks*`. See `debugger.lisp` for details.
 
 ## Integration
 
