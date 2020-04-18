@@ -121,9 +121,9 @@
 ;;  :RESTARTS          Print available restarts.
 ;;  :RESTART <n>, <n>  Invoke a restart with the given number.")
   (when (find-restart 'abort condition)
-    (format stream "~&;;  :ABORT, :Q         Exit by calling #'ABORT.~%"))
+    (format stream "~&;;  :ABORT, :Q         Invoke an ABORT restart.~%"))
   (when (find-restart 'continue condition)
-    (format stream "~&;;  :CONTINUE, :C      Exit by calling #'CONTINUE.~%"))
+    (format stream "~&;;  :CONTINUE, :C      Invoke a CONTINUE restart.~%"))
   (dolist (hook *help-hooks*)
     (funcall hook stream condition))
   (format stream "~&~

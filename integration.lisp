@@ -61,25 +61,39 @@
 
 ;;; Debugger commands
 
-(defmethod portable-condition-system::run-debugger-command :around
-    ((command (eql :abort)) stream condition &rest arguments)
-  (declare (ignore arguments))
+(defun invoke-maybe-foreign-restart (stream condition &rest names)
   (let* ((restarts (compute-restarts condition))
-         (restart (find-if (lambda (x) (member x '(cl:abort abort)))
+         (restart (find-if (lambda (x) (member x names))
                            restarts :key #'restart-name)))
     (if restart
         (invoke-restart-interactively restart)
-        (format stream "~&;; There is no active ABORT restart.~%"))))
+        (format stream "~&;; There is no active ~A restart.~%"
+                (first names)))))
+
+(defmethod portable-condition-system::run-debugger-command :around
+    ((command (eql :abort)) stream condition &rest arguments)
+  (declare (ignore arguments))
+  (invoke-maybe-foreign-restart stream condition '(cl:abort abort)))
 
 (defmethod portable-condition-system::run-debugger-command :around
     ((command (eql :continue)) stream condition &rest arguments)
   (declare (ignore arguments))
-  (let* ((restarts (compute-restarts condition))
-         (restart (find-if (lambda (x) (member x '(cl:continue continue)))
-                           restarts :key #'restart-name)))
-    (if restart
-        (invoke-restart-interactively restart)
-        (format stream "~&;; There is no active CONTINUE restart.~%"))))
+  (invoke-maybe-foreign-restart stream condition '(cl:continue continue)))
+
+;;; Debugger help
+
+(defun help-abort-hook (stream condition)
+  (when (and (not (find-restart 'abort condition))
+             (find-restart 'cl:abort condition))
+    (format stream "~&;;  :ABORT, :Q         Invoke an ABORT restart.~%")))
+
+(defun help-continue-hook (stream condition)
+  (when (and (not (find-restart 'continue condition))
+             (find-restart 'cl:continue condition))
+    (format stream "~&;;  :CONTINUE, :Q         Invoke a CONTINUE restart.~%")))
+
+(pushnew #'help-continue-hook portable-condition-system::*help-hooks*)
+(pushnew #'help-abort-hook portable-condition-system::*help-hooks*)
 
 ;;; Integration
 
