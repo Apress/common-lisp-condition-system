@@ -20,16 +20,9 @@ This system additionally defines a `common-lisp+portable-condition-system` packa
 
 The original comment from by Kent states:
 
-```lisp
-;;; This is a sample implementation. It is not in any way intended as the definition
-;;; of any aspect of the condition system. It is simply an existence proof that the
-;;; condition system can be implemented.
-;;;
-;;; While this written to be "portable", this is not a portable condition system
-;;; in that loading this file will not redefine your condition system. Loading this
-;;; file will define a bunch of functions which work like a condition system. Redefining
-;;; existing condition systems is beyond the goal of this implementation attempt.
-```
+> This is a sample implementation. It is not in any way intended as the definition of any aspect of the condition system. It is simply an existence proof that the condition system can be implemented.
+>
+> While this written to be "portable", this is not a portable condition system in that loading this file will not redefine your condition system. Loading this file will define a bunch of functions which work like a condition system. Redefining existing condition systems is beyond the goal of this implementation attempt.
 
 This system has been created as a part of the efforts behind my upcoming book, *Common Lisp Condition System*. It is meant to be educational material for people who want to see how to implement a condition system from scratch. Additionally, it may be used for Common Lisp implementations which do not have a condition system themselves and would nonetheless like to adopt.
 
