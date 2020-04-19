@@ -86,8 +86,7 @@ object the debugger was entered with."
                        (lines (split-sequence #\Newline report
                                               :remove-empty-subseqs t)))
                   (format stream "~&~{;; ~A~%~}" lines))
-    (error () (format stream "~&;; #<error while printing condition>~%")))
-  )
+    (error () (format stream "~&;; #<error while reporting condition>~%"))))
 
 (define-command :condition (stream condition)
   "Returns the condition object that the debugger was entered with."
@@ -130,9 +129,11 @@ informs the user about that fact."
            (loop with max-name-length = (restart-max-name-length restarts)
                  for i from 0
                  for restart in restarts
+                 for report = (handler-case (princ-to-string restart)
+                                (error () "#<error while reporting restart>"))
                  for restart-name = (or (restart-name restart) "")
                  do (format stream ";; ~2,' D: [~vA] ~A~%"
-                            i max-name-length restart-name restart)))
+                            i max-name-length restart-name report)))
           (t (format stream "~&;; No available restarts.~%")))))
 
 (define-command :restart (stream condition &optional n)
