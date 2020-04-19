@@ -133,7 +133,7 @@
 ;;; Debugger implementation
 
 (defun read-eval-print-command (stream condition)
-  (format t "~&[~D] Debug> "*debug-level*)
+  (format stream "~&[~D] Debug> "*debug-level*)
   (let* ((thing (read stream)))
     (multiple-value-bind (values actual-thing)
         (typecase thing
