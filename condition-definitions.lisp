@@ -2,7 +2,11 @@
 
 (in-package #:portable-condition-system)
 
-;;; Conditions
+;;; Standard conditions
+;;;
+;;; The standard condition types defined within this file are not documented via
+;;; documentation strings due to the repetitiveness of the contents of this
+;;; file.
 
 (define-condition warning (condition) ())
 
@@ -122,12 +126,30 @@
 
 ;;; Non-standard condition types
 
+(define-condition case-failure (type-error)
+  ((name :reader case-failure-name :initarg :name)
+   (possibilities :reader case-failure-possibilities :initarg :possibilities))
+  (:documentation "A condition type signaled when a case assertion
+(such as ECASE, ETYPECASE, CCASE, or CTYPECASE) fails to match its keyform.")
+  (:default-initargs :name (error "NAME required.")
+                     :possibilities (error "POSSIBILITIES required."))
+  (:report
+   (lambda (condition stream)
+     (format stream "~S fell through ~S expression.~%Wanted one of ~:S."
+             (type-error-datum condition)
+             (case-failure-name condition)
+             (case-failure-possibilities condition)))))
+
 (define-condition restart-not-found (control-error)
   ((restart-name :reader restart-not-found-restart-name :initarg :restart-name))
+  (:documentation "A condition type signaled when a restart with a given name
+was not found, even thought it was expected.")
   (:default-initargs :restart-name (error "RESTART-NAME required."))
   (:report (lambda (condition stream)
              (format stream "Restart ~S is not active."
                      (restart-not-found-restart-name condition)))))
 
 (define-condition abort-failure (control-error) ()
+  (:documentation "A condition type signaled when the ABORT restart invoked by
+function ABORT failed to transfer control outside of the function.")
   (:report "An ABORT restart failed to transfer control."))

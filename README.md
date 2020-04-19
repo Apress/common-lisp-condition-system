@@ -12,6 +12,7 @@ This code has been:
 * updated to shadow the ANSI CL symbol list instead of the original CLtL1 symbol list and to follow the ANSI CL standard in functionality,
 * packaged as an ASDF system `portable-condition-system`,
 * made installable as a system-wide condition system that integrates with the host condition system,
+* documented via documentation strings for all suitable definition forms,
 * ~~tested via the ANSI-TEST test suite.~~ TODO
 
 This system additionally defines a `common-lisp+portable-condition-system` package. It is equivalent to the `common-lisp` package, except all symbols related to the condition system are instead imported from the `portable-condition-system`, effectively overriding the condition system implementation from the host. This, along with running the `portable-condition-system/integration:install` function (see [Integration](#integration)), ensures that the host's condition system is overrided by the custom one defined by `portable-condition-system`.
