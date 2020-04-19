@@ -112,3 +112,5 @@ PORTABLE-CONDITION-SYSTEM>
 ## License
 
 CC0 / Public Domain.
+
+The test suite for this system is licensed under the [MIT license](t/LICENSE).
