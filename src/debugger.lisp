@@ -194,6 +194,6 @@ treated as debugger commands and integers are treated as arguments to
 (defun standard-debugger (condition &optional (stream *debug-io*))
   "Implements the standard debugger."
   (let ((*debug-level* (1+ *debug-level*)))
-    (run-debugger-command :report stream condition *debug-level*)
+    (run-debugger-command :report stream condition)
     (format stream "~&;; Type :HELP for available commands.~%")
     (loop (read-eval-print-command stream condition))))
