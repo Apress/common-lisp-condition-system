@@ -13,7 +13,8 @@ This code has been:
 * packaged as an ASDF system `portable-condition-system`,
 * made installable as a system-wide condition system that integrates with the host condition system,
 * documented via documentation strings for all suitable definition forms,
-* tested via the ANSI-TEST test suite.
+* submitted to [Quicklisp](https://github.com/quicklisp/quicklisp-projects/issues/1833),
+* tested via the ANSI-TEST test suites related to the condition system.
 
 This system additionally defines a `common-lisp+portable-condition-system` package. It is equivalent to the `common-lisp` package, except all symbols related to the condition system are instead imported from the `portable-condition-system`, effectively overriding the condition system implementation from the host. This, along with running the `portable-condition-system.integration:install` function (see the [integration system manual](integration/README.md) for details), ensures that the host's condition system is overridden by the custom one defined by `portable-condition-system`.
 
@@ -26,6 +27,8 @@ The original comment from by Kent states:
 > While this written to be "portable", this is not a portable condition system in that loading this file will not redefine your condition system. Loading this file will define a bunch of functions which work like a condition system. Redefining existing condition systems is beyond the goal of this implementation attempt.
 
 This system has been created as a part of the efforts behind my upcoming book, *Common Lisp Condition System*. It is meant to be educational material for people who want to see how to implement a condition system from scratch. Additionally, it may be used for Common Lisp implementations which do not have a condition system themselves and would nonetheless like to adopt.
+
+## Extending
 
 The debugger itself is roughly extensible by means of defining new methods on the internal `run-debugger-command` generic function and pushing help-printing hooks onto `*help-hooks*`. See [`debugger.lisp`](debugger.lisp) for details.
 

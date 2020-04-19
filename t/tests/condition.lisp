@@ -48,7 +48,7 @@
   (loop for (cnd . supers) in *allowed-condition-inclusions*
         append (loop for super in supers
                      unless (subtypep cnd super)
-                     collect (list cnd super)))
+                       collect (list cnd super)))
   nil)
 
 (deftest condition.3
@@ -58,5 +58,5 @@
         for cnd = (first cnds)
         append (loop for super in (set-difference *condition-types* cnds)
                      when (subtypep cnd super)
-                     collect (list cnd super)))
+                       collect (list cnd super)))
   nil)

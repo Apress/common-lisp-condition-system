@@ -152,11 +152,11 @@
 (deftest ecase.33
   (block done
     (tagbody
-     (ecase 'a (a (go 10)
+       (ecase 'a (a (go 10)
                   10
                   (return-from done 'bad)))
      10
-     (return-from done 'good)))
+       (return-from done 'good)))
   good)
 
 ;;; Test that explicit calls to macroexpand in subforms
@@ -164,11 +164,11 @@
 
 (deftest ecase.34
   (macrolet
-   ((%m (z) z))
-   (ecase (expand-in-current-env (%m :b))
-          (:a :bad1)
-          (:b :good)
-          (:c :bad2)))
+      ((%m (z) z))
+    (ecase (expand-in-current-env (%m :b))
+      (:a :bad1)
+      (:b :good)
+      (:c :bad2)))
   :good)
 
 (deftest ecase.error.1

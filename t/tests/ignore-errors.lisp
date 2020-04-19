@@ -27,12 +27,12 @@
 
 (deftest ignore-errors.5
   (handler-case
-   (ignore-errors (signal "foo"))
-   (condition () 'good))
+      (ignore-errors (signal "foo"))
+    (condition () 'good))
   good)
 
 (deftest ignore-errors.6
   (handler-case
-   (ignore-errors (signal "foo"))
-   (simple-condition () 'good))
+      (ignore-errors (signal "foo"))
+    (simple-condition () 'good))
   good)

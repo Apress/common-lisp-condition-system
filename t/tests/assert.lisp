@@ -19,22 +19,22 @@
 (deftest assert.3
   (let ((x nil))
     (handler-bind
-     ((error #'(lambda (c)
-                 (setq x 17)
-                 (let ((r (find-restart 'continue c)))
-                   (when r (invoke-restart r))))))
-     (assert x)
-     x))
+        ((error #'(lambda (c)
+                    (setq x 17)
+                    (let ((r (find-restart 'continue c)))
+                      (when r (invoke-restart r))))))
+      (assert x)
+      x))
   17)
 
 (deftest assert.3a
   (let ((x nil))
     (handler-bind
-     ((error #'(lambda (c)
-                 (setq x 17)
-                 (continue c))))
-     (assert x)
-     x))
+        ((error #'(lambda (c)
+                    (setq x 17)
+                    (continue c))))
+      (assert x)
+      x))
   17)
 
 
@@ -62,31 +62,31 @@
 (deftest assert.7
   (let ((x nil))
     (handler-bind
-     ((simple-error #'(lambda (c)
-                        (setq x 17)
-                        (continue c))))
-     (assert x () 'simple-error)
-     x))
+        ((simple-error #'(lambda (c)
+                           (setq x 17)
+                           (continue c))))
+      (assert x () 'simple-error)
+      x))
   17)
 
 (deftest assert.8
   (let ((x 0))
     (handler-bind
-     ((type-error #'(lambda (c)
-                        (incf x)
-                        (continue c))))
-     (assert (> x 5) () 'type-error)
-     x))
+        ((type-error #'(lambda (c)
+                         (incf x)
+                         (continue c))))
+      (assert (> x 5) () 'type-error)
+      x))
   6)
 
 (deftest assert.9
   (let ((x 0))
     (handler-bind
-     ((type-error #'(lambda (c) (declare (ignore c))
-                        (incf x)
-                        (continue))))
-     (assert (> x 5) () 'type-error)
-     x))
+        ((type-error #'(lambda (c) (declare (ignore c))
+                         (incf x)
+                         (continue))))
+      (assert (> x 5) () 'type-error)
+      x))
   6)
 
 ;;; Test that explicit calls to macroexpand in subforms
@@ -94,12 +94,12 @@
 
 (deftest assert.10
   (macrolet
-   ((%m (z) z))
-   (assert (expand-in-current-env (%m t))))
+      ((%m (z) z))
+    (assert (expand-in-current-env (%m t))))
   nil)
 
 (deftest assert.11
   (macrolet
-   ((%m (z) z))
-   (assert (expand-in-current-env (%m t)) () "Foo!"))
+      ((%m (z) z))
+    (assert (expand-in-current-env (%m t)) () "Foo!"))
   nil)

@@ -29,7 +29,7 @@
                    :initarg :format-control)
    (format-arguments :reader simple-condition-format-arguments
                      :initarg :format-arguments))
-  (:default-initargs :format-arguments '())
+  (:default-initargs :format-control nil :format-arguments '())
   (:report report-simple-condition))
 
 (define-condition simple-warning (simple-condition warning) ())

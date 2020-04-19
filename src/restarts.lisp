@@ -34,7 +34,7 @@ name name is printed if present; otherwise, the restart object is printed
 unreadably."
   (cond ((restart-report-function restart)
          (funcall (restart-report-function restart) stream))
-        ((restart-name restart) ; TODO
+        ((restart-name restart)
          (format stream "Invoke restart ~A." (restart-name restart)))
         (t
          (format stream "Invoke the anonymous restart ~S." restart))))

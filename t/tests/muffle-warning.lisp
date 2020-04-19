@@ -4,7 +4,6 @@
 ;;;; Contains: Tests of the MUFFLE-WARNING restart and function
 
 (in-package #:portable-condition-system/test)
-;;; TODO indent everything
 
 (deftest muffle-warning.1
   (restart-case

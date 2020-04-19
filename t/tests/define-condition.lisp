@@ -374,7 +374,7 @@
 
 (deftest condition-22-slots.1
   (let ((c (make-condition 'condition-22 :slot1 'a :slot2 'b
-                           :slot3 'c :slot4 'd)))
+                                         :slot3 'c :slot4 'd)))
     (and (typep c 'condition-4)
          (typep c 'condition-22)
          (eqlt (condition-4/slot-1 c) 'a)

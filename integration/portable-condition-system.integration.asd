@@ -9,5 +9,3 @@
   :depends-on (#:portable-condition-system
                #:trivial-custom-debugger)
   :components ((:file "integration")))
-
-;;; TODO tests
