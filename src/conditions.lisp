@@ -1,4 +1,4 @@
-;;;; conditions.lisp
+;;;; src/conditions.lisp
 
 (in-package #:portable-condition-system)
 
@@ -78,7 +78,7 @@ transferred to after setting the value."
 
 ;;; Case assertions - common
 
-(defun case-failure (datum operator-name complex-type keys)
+(defun case-failure (datum complex-type operator-name keys)
   "Signals a CASE-FAILURE error using the provided datum, the name of the case
 operator, complex type specifier, and the case keys which were not matched."
   `(error 'case-failure :datum ,datum
@@ -86,41 +86,43 @@ operator, complex type specifier, and the case keys which were not matched."
                         :name ',operator-name
                         :possibilities ',keys))
 
-(defun check-case-no-otherwise-clause (cases macro-name)
-  "Signals an error if any other provided cases is a T/OTHERWISE clause."
-  (dolist (case cases)
-    (when (member (first case) '(t otherwise))
-      (error "~S cases are not allowed in ~S." (first case) macro-name))))
+(defun case-transform-t-otherwise-cases (cases)
+  "Transforms T/OTHERWISE cases to prevent them from having a special effect
+in CASE."
+  (loop for case in cases
+        for (key . forms) = case
+        if (member key '(t otherwise))
+          collect (cons (list key) forms)
+        else
+          collect case))
 
 (defun case-accumulate-keys (cases)
   "Collects all keys from the provided cases into a single list."
   (loop for case in cases
         for key-or-keys = (first case)
-        if (atom key-or-keys)
-          collect key-or-keys
+        if (listp key-or-keys)
+          append key-or-keys
         else
-          append key-or-keys))
+          collect key-or-keys))
 
 ;;; Case assertions - non-correctable
 
 (defmacro ecase (keyform &rest cases)
   "Evaluates the keyform and checks if it matches any of the keys in the
 provided cases. Signals an error otherwise."
-  (check-case-no-otherwise-clause cases 'ecase)
   (let ((keys (case-accumulate-keys cases))
         (variable (gensym "ECASE-VARIABLE")))
     `(let ((,variable ,keyform))
-       (case ,keyform ,@cases
+       (case ,variable ,@(case-transform-t-otherwise-cases cases)
              (t ,(case-failure variable 'member 'ecase keys))))))
 
 (defmacro etypecase (keyform &rest cases)
   "Evaluates the keyform and checks if it is of any of the types in the
 provided cases. Signals an error otherwise."
-  (check-case-no-otherwise-clause cases 'etypecase)
-  (let ((keys (case-accumulate-cases cases))
+  (let ((keys (case-accumulate-keys cases))
         (variable (gensym "ETYPECASE-VARIABLE")))
     `(let ((,variable ,keyform))
-       (typecase ,keyform ,@cases
+       (typecase ,keyform ,@cases ;; (case-transform-t-otherwise-cases cases)
                  (t ,(case-failure variable 'or 'etypecase keys))))))
 
 ;;; Case assertions - correctable
@@ -129,31 +131,29 @@ provided cases. Signals an error otherwise."
   "Evaluates the keyform (which must be a place) and checks if it matches any of
 the keys in the provided cases. Signals a correctable error otherwise, allowing
 the programmer to modify the value stored in the keyform."
-  (check-case-no-otherwise-clause cases 'ecase)
-  (let ((keys (case-accumulate-cases cases))
+  (let ((keys (case-accumulate-keys cases))
         (block-name (gensym "CCASE-BLOCK"))
         (tag (gensym "CCASE-TAG")))
     `(block ,block-name
        (tagbody ,tag
           (return-from ,block-name
-            (case ,keyform ,@cases
-                  (t (with-store-value-restart (keyform tag)
+            (case ,keyform ,@(case-transform-t-otherwise-cases cases)
+                  (t (with-store-value-restart (,keyform ,tag)
                        ,(case-failure keyform 'member 'ccase keys)))))))))
 
 (defmacro ctypecase (keyform &rest cases)
   "Evaluates the keyform (which must be a place) and checks if it is of any of
 the types in the provided cases. Signals a correctable error otherwise, allowing
 the programmer to modify the value stored in the keyform."
-  (check-case-no-otherwise-clause cases 'ecase)
-  (let ((keys (case-accumulate-cases cases))
+  (let ((keys (case-accumulate-keys cases))
         (block-name (gensym "CTYPECASE-BLOCK"))
         (tag (gensym "CTYPECASE-TAG")))
     `(block ,block-name
        (tagbody ,tag
           (return-from ,block-name
-            (case ,keyform ,@cases
-                  (t (with-store-value-restart (keyform tag)
-                       ,(case-failure keyform 'or 'ctypecase keys)))))))))
+            (typecase ,keyform ,@cases ;; (case-transform-t-otherwise-cases cases)
+                      (t (with-store-value-restart (,keyform ,tag)
+                           ,(case-failure keyform 'or 'ctypecase keys)))))))))
 
 ;;; ASSERT
 
@@ -203,22 +203,25 @@ ARGUMENTS, if supplied, are used to report the assertion error."
           (unless ,test-form
             (restart-case ,error-form
               (continue ()
-                :report (lambda (stream) (assert-report ',places stream))
+                :report (lambda (stream)
+                          (assert-restart-report ',places stream))
                 ,@(mapcar #'make-place-setter places)
                 (go ,tag))))))))
 
 ;;; CHECK-TYPE
 
-(defun make-check-type-error (place value type-or-type-string)
+(defun make-check-type-error (place value type type-string)
   "Instantiates an error object suitable to signal within CHECK-TYPE, using the
 provided place, value, and expected type or provided type string."
-  (let ((format-control (if (stringp type-or-type-string)
+  (let ((format-control (if type-string
                             "The value of ~S is ~S, which is not ~A."
                             "The value of ~S is ~S, which is not of type ~S.")))
     (make-condition
-     'simple-error
+     'simple-type-error
+     :datum value
+     :expected-type type
      :format-control format-control
-     :format-arguments (list place value type-or-type-string))))
+     :format-arguments (list place value (or type-string type)))))
 
 (defmacro check-type (place type &optional type-string)
   "Evaluates PLACE and checks if its value is of the provided type. Otherwise,
@@ -228,13 +231,12 @@ retried. The optional TYPE-STRING argument is used to construct the report for
 the signaled error."
   (let ((block-name (gensym "CHECK-TYPE-BLOCK"))
         (tag (gensym "CHECK-TYPE-TAG"))
-        (condition-var (gensym "CONDITION"))
-        (type-or-type-string (or type-string `',type)))
+        (condition-var (gensym "CONDITION")))
     `(block ,block-name
        (tagbody ,tag
           (when (typep ,place ',type) (return-from ,block-name nil))
           (let ((,condition-var (make-check-type-error
-                                 ',place ,place ,type-or-type-string)))
+                                 ',place ,place ',type ,type-string)))
             (with-store-value-restart (,place ,tag)
               (error ,condition-var)))))))
 
@@ -302,10 +304,11 @@ condition handlers which match the type of the signaled condition."
     (if (typep condition *break-on-signals*)
         (break "~A~%Break entered because of *BREAK-ON-SIGNALS*."
                condition))
-    (dolist (cluster *handler-clusters*)
-      (dolist (handler cluster)
-        (when (typep condition (car handler))
-          (funcall (cdr handler) condition))))))
+    (loop for (cluster . remaining-clusters) on *handler-clusters*
+          do (let ((*handler-clusters* remaining-clusters))
+               (dolist (handler cluster)
+                 (when (typep condition (car handler))
+                   (funcall (cdr handler) condition)))))))
 
 (defun warn (datum &rest arguments)
   "Coerces the provided arguments to a warning condition, establishes a
@@ -318,7 +321,8 @@ to the error output stream."
     (check-type condition warning "a warning condition")
     (with-simple-restart (muffle-warning "Muffle the warning.")
       (signal condition)
-      (format *error-output* "~&;; Warning:~%~A~%" condition))))
+      (format *error-output* "~&;; Warning:~%~A~%" condition))
+    nil))
 
 (defun error (datum &rest arguments)
   "Coerces the provided arguments to an error condition and signals it. If the
@@ -394,7 +398,7 @@ it."
       (return-from ,block-name
         ,(if lambda-list
              `(let ((,(first lambda-list) ,temp-var)) ,@body)
-             `(progn ,@body))))))
+             `(locally ,@body))))))
 
 (defun make-handler-case-without-no-error-case (form cases)
   "Generates the HANDLER-CASE body in situation where no :NO-ERROR case is

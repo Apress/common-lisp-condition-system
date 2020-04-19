@@ -1,4 +1,4 @@
-;;;; restarts.lisp
+;;;; src/restarts.lisp
 
 (in-package #:portable-condition-system)
 
@@ -46,10 +46,11 @@ unreadably."
 condition object. If the condition is null, return true; otherwise, if the
 restart is associated with a different condition, return false; otherwise,
 return true."
-  (or (null condition)
-      (let ((associated-conditions (restart-associated-conditions restart)))
-        (or (null associated-conditions)
-            (member condition (restart-associated-conditions restart))))))
+  (and (funcall (restart-test-function restart) condition)
+       (or (null condition)
+           (let ((associated-conditions (restart-associated-conditions restart)))
+             (or (null associated-conditions)
+                 (member condition (restart-associated-conditions restart)))))))
 
 (defun compute-restarts (&optional condition)
   "Return a list of all currently established restarts. If the optional
@@ -63,11 +64,13 @@ conditions other than the provided one."
   "Finds the first currently established restart with the provided name. If the
 optional condition argument is supplied, the search skips over all restarts
 which are associated with conditions other than the provided one."
-  (dolist (restart-cluster *restart-clusters*)
-    (dolist (restart restart-cluster)
-      (when (and (or (eq restart name) (eq (restart-name restart) name))
-                 (restart-visible-p restart condition))
-        (return-from find-restart restart)))))
+  (loop for (cluster . remaining-clusters) on *restart-clusters*
+        do (let ((*restart-clusters* remaining-clusters))
+             (dolist (restart cluster)
+               (when (and (or (eq restart name)
+                              (eq (restart-name restart) name))
+                          (restart-visible-p restart condition))
+                 (return-from find-restart restart))))))
 
 (defgeneric invoke-restart (restart &rest arguments)
   (:documentation "Invokes a restart with the provided argument. If the restart
@@ -241,7 +244,8 @@ HANDLER-CASE."
                    (warn 'simple-warning)
                    (error 'simple-error)))
            (condition (gensym "CONDITION")))
-      `(let ((,condition (coerce-to-condition ,datum ,args ',type ',function)))
+      `(let ((,condition (coerce-to-condition ,datum (list ,@args)
+                                              ',type ',function)))
          (with-condition-restarts ,condition (car *restart-clusters*)
            (,function ,condition))))))
 
@@ -251,7 +255,7 @@ associated with the restarts that are newly established by HANDLER-CASE."
   (destructuring-bind (function format-control datum . args) expansion
     (let* ((type 'simple-error)
            (condition (gensym "CONDITION")))
-      `(let ((,condition (coerce-to-condition ,datum ,args ',type ',function)))
+      `(let ((,condition (coerce-to-condition ,datum ',args ',type ',function)))
          (with-condition-restarts ,condition (car *restart-clusters*)
            (,function ,format-control ,condition))))))
 
@@ -279,6 +283,7 @@ their value from RESTART-CASE."
              (restart-case-make-restart-case block-tag temp-var datum)))
       `(block ,block-tag
          (let ((,temp-var nil))
+           (declare (ignorable ,temp-var))
            (tagbody
               (restart-bind ,(mapcar #'make-restart-binding data)
                 (return-from ,block-tag

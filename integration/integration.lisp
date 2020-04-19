@@ -1,12 +1,12 @@
-;;;; integration.lisp
+;;;; integration/integration.lisp
 
-(uiop:define-package #:portable-condition-system/integration
+(uiop:define-package #:portable-condition-system.integration
   (:use #:common-lisp+portable-condition-system
         #:trivial-custom-debugger)
   (:export #:debugger
            #:install))
 
-(in-package #:portable-condition-system/integration)
+(in-package #:portable-condition-system.integration)
 
 ;;; FOREIGN-CONDITION
 

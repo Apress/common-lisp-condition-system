@@ -1,4 +1,4 @@
-;;;; conditions.lisp
+;;;; src/conditions.lisp
 
 (in-package #:portable-condition-system)
 
@@ -14,6 +14,8 @@
 
 (define-condition error (serious-condition) ())
 
+(define-condition style-warning (warning) ())
+
 (defun report-simple-condition (condition stream)
   (let ((format-control (simple-condition-format-control condition))
         (format-args (simple-condition-format-arguments condition)))
@@ -27,8 +29,7 @@
                    :initarg :format-control)
    (format-arguments :reader simple-condition-format-arguments
                      :initarg :format-arguments))
-  (:default-initargs :format-control nil
-                     :format-arguments '())
+  (:default-initargs :format-arguments '())
   (:report report-simple-condition))
 
 (define-condition simple-warning (simple-condition warning) ())
@@ -48,8 +49,6 @@
 (define-condition type-error (error)
   ((datum :reader type-error-datum :initarg :datum)
    (expected-type :reader type-error-expected-type :initarg :expected-type))
-  (:default-initargs :datum (error "DATUM required.")
-                     :expected-type (error "EXPECTED-TYPE required."))
   (:report report-type-error))
 
 (define-condition simple-type-error (simple-condition type-error) ())
@@ -59,8 +58,7 @@
 (define-condition program-error (error) ())
 
 (define-condition cell-error (error)
-  ((name :reader cell-error-name :initarg :name))
-  (:default-initargs :name (error "NAME required.")))
+  ((name :reader cell-error-name :initarg :name)))
 
 (defun report-unbound-variable (condition stream)
   (format stream "The variable ~S is unbound."
@@ -83,12 +81,10 @@
 
 (define-condition unbound-slot (cell-error)
   ((instance :reader unbound-slot-instance :initarg :instance))
-  (:default-initargs :instance (error "INSTANCE required."))
   (:report report-unbound-slot))
 
 (define-condition stream-error (error)
-  ((stream :reader stream-error-stream :initarg :stream))
-  (:default-initargs :stream (error "STREAM required.")))
+  ((stream :reader stream-error-stream :initarg :stream)))
 
 (define-condition end-of-file (stream-error) ())
 
@@ -97,14 +93,11 @@
 (define-condition reader-error (parse-error stream-error) ())
 
 (define-condition package-error (error)
-  ((package :reader package-error-package :initarg :package))
-  (:default-initargs :package (error "PACKAGE required.")))
+  ((package :reader package-error-package :initarg :package)))
 
 (define-condition arithmetic-error (error)
   ((operation :reader operation-error-operation :initarg :operation)
-   (operands :reader operands-error-operands :initarg :operands))
-  (:default-initargs :operation (error "OPERATION required.")
-                     :operands (error "OPERNADS required.")))
+   (operands :reader operands-error-operands :initarg :operands)))
 
 (define-condition division-by-zero (arithmetic-error) ())
 
@@ -117,12 +110,10 @@
 (define-condition floating-point-underflow (arithmetic-error) ())
 
 (define-condition file-error (error)
-  ((pathname :reader pathname-error-pathname :initarg :pathname))
-  (:default-initargs :pathname (error "PATHNAME required.")))
+  ((pathname :reader pathname-error-pathname :initarg :pathname)))
 
 (define-condition print-not-readable (error)
-  ((object :reader print-not-readable-object :initarg :object))
-  (:default-initargs :object (error "OBJECT required.")))
+  ((object :reader print-not-readable-object :initarg :object)))
 
 ;;; Non-standard condition types
 
@@ -131,8 +122,6 @@
    (possibilities :reader case-failure-possibilities :initarg :possibilities))
   (:documentation "A condition type signaled when a case assertion
 (such as ECASE, ETYPECASE, CCASE, or CTYPECASE) fails to match its keyform.")
-  (:default-initargs :name (error "NAME required.")
-                     :possibilities (error "POSSIBILITIES required."))
   (:report
    (lambda (condition stream)
      (format stream "~S fell through ~S expression.~%Wanted one of ~:S."
@@ -144,7 +133,6 @@
   ((restart-name :reader restart-not-found-restart-name :initarg :restart-name))
   (:documentation "A condition type signaled when a restart with a given name
 was not found, even thought it was expected.")
-  (:default-initargs :restart-name (error "RESTART-NAME required."))
   (:report (lambda (condition stream)
              (format stream "Restart ~S is not active."
                      (restart-not-found-restart-name condition)))))

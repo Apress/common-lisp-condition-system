@@ -1,4 +1,4 @@
-;;;; debugger.lisp
+;;;; src/debugger.lisp
 
 (in-package #:portable-condition-system)
 
@@ -115,23 +115,25 @@ informs the user about that fact."
 
 (define-command :c (stream condition)
   "Shorthand for :CONTINUE."
-  (run-debugger-command :c stream condition))
+  (run-debugger-command :continue stream condition))
 
 (defun restart-max-name-length (restarts)
   "Returns the length of the longest name from the provided restarts."
   (flet ((name-length (restart) (length (string (restart-name restart)))))
-    (reduce #'max (mapcar #'name-length restarts))))
+    (if restarts (reduce #'max (mapcar #'name-length restarts)) 0)))
 
 (define-command :restarts (stream condition)
   "Prints a list of available restarts."
-  (format stream "~&;; Available restarts:~%")
-  (loop with restarts = (compute-restarts condition)
-        with max-name-length = (restart-max-name-length restarts)
-        for i from 0
-        for restart in restarts
-        for restart-name = (or (restart-name restart) "")
-        do (format stream ";; ~2,' D: [~vA] ~A~%"
-                   i max-name-length restart-name restart)))
+  (let ((restarts (compute-restarts condition)))
+    (cond (restarts
+           (format stream "~&;; Available restarts:~%")
+           (loop with max-name-length = (restart-max-name-length restarts)
+                 for i from 0
+                 for restart in restarts
+                 for restart-name = (or (restart-name restart) "")
+                 do (format stream ";; ~2,' D: [~vA] ~A~%"
+                            i max-name-length restart-name restart)))
+          (t (format stream "~&;; No available restarts.~%")))))
 
 (define-command :restart (stream condition &optional n)
   "Invokes a particular restart."

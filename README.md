@@ -13,9 +13,9 @@ This code has been:
 * packaged as an ASDF system `portable-condition-system`,
 * made installable as a system-wide condition system that integrates with the host condition system,
 * documented via documentation strings for all suitable definition forms,
-* ~~tested via the ANSI-TEST test suite.~~ TODO
+* tested via the ANSI-TEST test suite.
 
-This system additionally defines a `common-lisp+portable-condition-system` package. It is equivalent to the `common-lisp` package, except all symbols related to the condition system are instead imported from the `portable-condition-system`, effectively overriding the condition system implementation from the host. This, along with running the `portable-condition-system/integration:install` function (see [Integration](#integration)), ensures that the host's condition system is overrided by the custom one defined by `portable-condition-system`.
+This system additionally defines a `common-lisp+portable-condition-system` package. It is equivalent to the `common-lisp` package, except all symbols related to the condition system are instead imported from the `portable-condition-system`, effectively overriding the condition system implementation from the host. This, along with running the `portable-condition-system.integration:install` function (see the [integration system manual](integration/README.md) for details), ensures that the host's condition system is overridden by the custom one defined by `portable-condition-system`.
 
 ## Background
 
@@ -28,6 +28,12 @@ The original comment from by Kent states:
 This system has been created as a part of the efforts behind my upcoming book, *Common Lisp Condition System*. It is meant to be educational material for people who want to see how to implement a condition system from scratch. Additionally, it may be used for Common Lisp implementations which do not have a condition system themselves and would nonetheless like to adopt.
 
 The debugger itself is roughly extensible by means of defining new methods on the internal `run-debugger-command` generic function and pushing help-printing hooks onto `*help-hooks*`. See [`debugger.lisp`](debugger.lisp) for details.
+
+## Tests
+
+The test suite has been adapted from [ANSI-TEST](https://gitlab.common-lisp.net/ansi-test/ansi-test) at commit `c4679fdd9966`. To run it, evaluate `(asdf:test-system :portable-condition-system)` or manually load ASDF system `portable-condition-system/test` and run `(portable-condition-system/test:run)`.
+
+## Example
 
 Example debugger session:
 
@@ -98,43 +104,6 @@ PORTABLE-CONDITION-SYSTEM> (tagbody :go
 
 NIL
 PORTABLE-CONDITION-SYSTEM> 
-```
-
-## Integration
-
-The task of integrating this condition system with the host Lisp's one is handled by the ASDF system `portable-condition-system/integration` which loads a package with the same name.
-
-Executing the `install` function from that package installs a system-wide debugger defined in PCS. Executing `trivial-custom-debugger:with-debugger` with the `portable-condition-system/integration:debugger` function changes the debugger within dynamic extent only.
-
-This system additionally contains a translation layer which translates condition objects and restarts from the host's condition system into condition objects and restarts used by this system's debugger for better system integration of the PCS debugger.
-
-Example integrated debugger session:
-
-```lisp
-PORTABLE-CONDITION-SYSTEM/INTEGRATION> (with-debugger (#'debugger)
-                                         (+ 2 :two))
-;; Debugger level 1 entered on FOREIGN-ERROR:
-;; Foreign condition FOREIGN-ERROR was signaled:
-;; Value of :TWO in (+ 2 :TWO) is :TWO, not a NUMBER.
-;; Type :HELP for available commands.
-[1] Debug> :abort
-; Evaluation aborted on #<COMMON-LISP:SIMPLE-TYPE-ERROR expected-type: NUMBER datum: :TWO>.
-
-PORTABLE-CONDITION-SYSTEM/INTEGRATION> (with-debugger (#'debugger)
-                                         (cl:break "This is hopelessly broken."))
-;; Debugger level 1 entered on FOREIGN-CONDITION:
-;; Foreign condition FOREIGN-CONDITION was signaled:
-;; This is hopelessly broken.
-;; Type :HELP for available commands.
-[1] Debug> :restarts
-
-;; Available restarts:
-;;  0: [CONTINUE] Return from COMMON-LISP:BREAK.
-;;  1: [RETRY   ] Retry SLIME REPL evaluation request.
-;;  2: [ABORT   ] Return to SLIME's top level.
-;;  3: [ABORT   ] abort thread (#<THREAD "repl-thread" RUNNING {100CBF9DE3}>)
-[1] Debug> 2
-; Evaluation aborted on NIL.
 ```
 
 ## License

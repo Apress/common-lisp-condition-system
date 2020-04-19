@@ -1,7 +1,7 @@
-;;;; package.lisp
+;;;; src/package.lisp
 
 (defpackage #:portable-condition-system/install
-  (:use :cl))
+  (:use #:cl))
 
 (in-package #:portable-condition-system/install)
 
@@ -27,6 +27,8 @@
           #:handler-case #:handler-bind #:ignore-errors)
         '(;; Basic condition types
           #:condition #:warning #:serious-condition #:error
+          ;; Style warning
+          #:style-warning
           ;; Simple condition
           #:simple-condition #:simple-warning #:simple-error
           #:simple-condition-format-control #:simple-condition-format-arguments
