@@ -8,7 +8,7 @@ This code has been:
 * forked from its [original source location](http://www.nhplace.com/kent/CL/Revision-18.lisp),
 * cleaned to compile on contemporary Common Lisp implementations without warnings,
 * downcased and adjusted to follow modern Lisp style standards,
-* modernized to use ANSI CL functionalities, wherever applicable: for example, `print-unreadable-object`, `defmethod print-object`, `defclass`, or `destructuring-bind`,
+* modernized to use ANSI CL functionalities, wherever applicable: for example, `defclass`, `defmethod`, `print-object`, `print-unreadable-object`, or `destructuring-bind`,
 * updated to shadow the ANSI CL symbol list instead of the original CLtL1 symbol list and to follow the ANSI CL standard in functionality,
 * packaged as an ASDF system `portable-condition-system`,
 * made installable as a system-wide condition system that integrates with the host condition system,
