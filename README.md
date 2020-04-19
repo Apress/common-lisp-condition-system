@@ -10,9 +10,9 @@ This code has been:
 * downcased and adjusted to follow modern Lisp style standards,
 * modernized to use ANSI CL functionalities, wherever applicable: for example, `defclass`, `defmethod`, `print-object`, `print-unreadable-object`, or `destructuring-bind`,
 * updated to shadow the ANSI CL symbol list instead of the original CLtL1 symbol list and to follow the ANSI CL standard in functionality,
-* packaged as an ASDF system `portable-condition-system`,
-* made installable as a system-wide condition system that integrates with the host condition system,
 * documented via documentation strings for all suitable definition forms,
+* made installable as a system-wide condition system that integrates with the host condition system,
+* packaged as an ASDF system `portable-condition-system`,
 * submitted to [Quicklisp](https://github.com/quicklisp/quicklisp-projects/issues/1833),
 * tested via the ANSI-TEST test suites related to the condition system.
 
