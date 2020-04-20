@@ -29,8 +29,10 @@
   :pathname "t"
   :depends-on (#:portable-condition-system)
   :components ((:file "package")
-               (:file "framework")
-               (:module "tests"
+               (:file "1am")
+               (:file "ansi-test-data")
+               (:file "ansi-test-support")
+               (:module "ansi-test"
                 :components
                 ((:file "condition")
                  (:file "cell-error-name")
