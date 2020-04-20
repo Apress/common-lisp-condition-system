@@ -3,8 +3,7 @@
 (in-package #:portable-condition-system/test)
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
-  (locally
-      (declare (optimize safety))
+  (locally (declare (optimize safety))
     (ignore-errors
      (setf (logical-pathname-translations "PCSTEST")
            `(("**;*.*.*"
@@ -60,8 +59,7 @@
     warning))
 
 (defparameter *cl-type-symbols*
-  '(
-    atom
+  '(atom
     base-char
     base-string
     bignum
@@ -83,12 +81,10 @@
     simple-string
     simple-vector
     standard-char
-    unsigned-byte
-    ))
+    unsigned-byte))
 
 (defparameter *cl-types-that-are-classes-symbols*
-  '(
-    arithmetic-error
+  '(arithmetic-error
     array
     bit-vector
     broadcast-stream
@@ -162,12 +158,10 @@
     unbound-variable
     undefined-function
     vector
-    warning
-    ))
+    warning))
 
 (defparameter *cl-system-class-symbols*
-  '(
-    array
+  '(array
     bit-vector
     broadcast-stream
     built-in-class
@@ -209,15 +203,13 @@
     synonym-stream
     t
     two-way-stream
-    vector
-    ))
+    vector))
 
 (defparameter *cl-class-symbols*
   '(standard-object structure-object))
 
 (defparameter *cl-condition-type-symbols*
-  '(
-    arithmetic-error
+  '(arithmetic-error
     cell-error
     condition
     control-error
@@ -246,8 +238,7 @@
     unbound-slot
     unbound-variable
     undefined-function
-    warning
-    ))
+    warning))
 
 (defparameter *cl-all-type-symbols*
   (reduce #'union
