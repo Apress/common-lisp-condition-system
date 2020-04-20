@@ -2,10 +2,6 @@
 
 (in-package #:portable-condition-system/test)
 
-;;; TODO these tests won't work with integration loaded.
-
-;;; TODO debugger tests
-
 (defun run-debugger-command
     (command input-string &optional condition &rest args)
   (with-input-from-string (input input-string)

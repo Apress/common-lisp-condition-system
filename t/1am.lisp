@@ -16,6 +16,11 @@
 
 (defun run (&optional (tests *tests*))
   "Run each test in the sequence `tests'. Default is `*tests*'."
+  (when (find-package '#:portable-condition-system/integration)
+    (cl:cerror
+     "Run the test suite nonetheleess."
+     "The PCS test suite will not work with the ~
+      PORTABLE-CONDITION-SYSTEM/INTEGRATION system loaded."))
   (let ((*running* t))
     (%run (lambda () (mapc #'funcall tests))
           (length tests)))
