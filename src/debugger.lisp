@@ -38,12 +38,13 @@ format control and format arguments."
   (:documentation "Executes the provided debugger command, reading input from
 and printing output to the provided stream. The condition object the debugger
 was entered with and optional command arguments are available for use within
-the command itself.")
-  (:method (command stream condition &rest arguments)
-    "Informs the user that the provided debugger command was not recognized."
-    (declare (ignore arguments))
-    (format stream "~&;; ~S is not a recognized command.
-;; Type :HELP for available commands.~%" command)))
+the command itself."))
+
+(defmethod run-debugger-command (command stream condition &rest arguments)
+  "Informs the user that the provided debugger command was not recognized."
+  (declare (ignore arguments))
+  (format stream "~&;; ~S is not a recognized command.
+;; Type :HELP for available commands.~%" command))
 
 (defmacro define-command (name (stream condition &rest arguments) &body body)
   "Accepts a command name (which should be a keyword) and generates a DEFMETHOD
@@ -198,3 +199,5 @@ treated as debugger commands and integers are treated as arguments to
     (run-debugger-command :report stream condition)
     (format stream "~&;; Type :HELP for available commands.~%")
     (loop (read-eval-print-command stream condition))))
+
+;;; TODO debugger.3 test is broken, fix it

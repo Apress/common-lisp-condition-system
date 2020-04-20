@@ -9,8 +9,9 @@
    #:foreign-condition-wrapped-condition
    #:host-condition-to-pcs
    ;; Restarts
+   #:host-restart
    #:call-with-host-restarts #:with-host-restarts
-   #:host-restart-to-pcs
+   #:host-restart-to-pcs #:host-restart-wrapped-restart
    ;; Integration
    #:debugger))
 
@@ -20,25 +21,29 @@
 
 (defun foreign-condition-report (condition stream)
   (format stream "Foreign condition ~S was signaled:~%~A"
-          (type-of condition) (foreign-condition-condition condition)))
+          (type-of condition) (foreign-condition-wrapped-condition condition)))
+
+(defgeneric host-condition-to-pcs (condition))
 
 (define-condition foreign-condition ()
   ((wrapped-condition :reader foreign-condition-wrapped-condition
                       :initarg :wrapped-condition))
-  (:default-initargs :condition (error "CONDITION required."))
+  (:default-initargs
+   :wrapped-condition (error "WRAPPED-CONDITION required."))
   (:report foreign-condition-report))
+
+(defmethod host-condition-to-pcs ((condition cl:error))
+  (make-condition 'foreign-error :wrapped-condition condition))
 
 (define-condition foreign-warning (foreign-condition warning) ())
 
+(defmethod host-condition-to-pcs ((condition cl:warning))
+  (make-condition 'foreign-warning :wrapped-condition condition))
+
 (define-condition foreign-error (foreign-condition error) ())
 
-(defgeneric host-condition-to-pcs (condition)
-  (:method ((condition cl:error))
-    (make-condition 'foreign-error :wrapped-condition condition))
-  (:method ((condition cl:warning))
-    (make-condition 'foreign-warning :wrapped-condition condition))
-  (:method ((condition cl:condition))
-    (make-condition 'foreign-condition :wrapped-condition condition)))
+(defmethod host-condition-to-pcs ((condition cl:condition))
+  (make-condition 'foreign-condition :wrapped-condition condition))
 
 ;;; Debugger commands
 
@@ -79,7 +84,7 @@
 ;;; Host restarts
 
 (defstruct (host-restart (:include restart))
-  (:wrapped-restart (error "WRAPPED-RESTART required.")))
+  (wrapped-restart (error "WRAPPED-RESTART required.")))
 
 (defmethod invoke-restart ((restart host-restart) &rest arguments)
   (cl:invoke-restart (host-restart-wrapped-restart restart) arguments))
@@ -94,16 +99,29 @@
    :report-function (lambda (stream) (format stream "(*) ~A" host-restart))
    :wrapped-restart host-restart))
 
-(defun call-with-host-restarts (host-condition thunk)
-  (let* ((host-restarts (cl:compute-restarts host-condition))
-         (restarts (mapcar #'host-restart-to-pcs host-restarts))
+(defun compute-host-restarts (host-condition)
+  (let* ((restarts (apply #'append portable-condition-system::*restart-clusters*))
+         (old-host-restarts (remove-if-not #'host-restart-p restarts))
+         (cl-restarts (cl:compute-restarts host-condition)))
+    (loop for cl-restart in cl-restarts
+          for maybe-restart = (find cl-restart old-host-restarts
+                                    :key #'host-restart-wrapped-restart)
+          collect (or maybe-restart (host-restart-to-pcs cl-restart)))))
+
+(defun call-with-host-restarts (condition thunk)
+  (let* ((host-restarts (compute-host-restarts
+                         (when (typep condition 'foreign-condition)
+                           (foreign-condition-wrapped-condition condition))))
          (portable-condition-system::*restart-clusters*
            (append portable-condition-system::*restart-clusters*
-                   (list restarts))))
+                   (list host-restarts))))
     (funcall thunk)))
 
-(defmacro with-host-restarts ((&optional condition) &body body)
-  `(call-with-host-restarts ,condition (lambda () ,@body)))
+(defmethod compute-restarts :around (&optional condition)
+  (call-with-host-restarts condition #'call-next-method))
+
+(defmethod find-restart :around (name &optional condition)
+  (call-with-host-restarts condition #'call-next-method))
 
 ;;; Integration
 

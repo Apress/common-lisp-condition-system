@@ -23,7 +23,7 @@ bound, the restart is printed unreadably; otherwise, it is reported by means of
 calling the next printing method."
   (if *print-escape*
       (print-unreadable-object (restart stream :type t :identity t)
-        (princ (restart-name restart) stream))
+        (prin1 (restart-name restart) stream))
       (call-next-method)))
 
 (defmethod print-object ((restart restart) stream)
@@ -52,59 +52,81 @@ return true."
              (or (null associated-conditions)
                  (member condition (restart-associated-conditions restart)))))))
 
-(defun compute-restarts (&optional condition)
-  "Return a list of all currently established restarts. If the optional
-condition argument is supplied, omits all restarts which are associated with
-conditions other than the provided one."
+(defgeneric compute-restarts (&optional condition)
+  (:documentation "Return a list of all currently established restarts. If the
+optional condition argument is supplied, omits all restarts which are associated
+with conditions other than the provided one."))
+
+(defmethod compute-restarts (&optional condition)
+  "Appends all restart clusters and deletes all restarts which should not be
+visible."
   (let ((all-restarts (copy-list (apply #'append *restart-clusters*))))
-    (remove-if-not (lambda (restart) (restart-visible-p restart condition))
+    (delete-if-not (lambda (restart) (restart-visible-p restart condition))
                    all-restarts)))
 
-(defun find-restart (name &optional condition)
-  "Finds the first currently established restart with the provided name. If the
-optional condition argument is supplied, the search skips over all restarts
-which are associated with conditions other than the provided one."
-  (loop for (cluster . remaining-clusters) on *restart-clusters*
-        do (let ((*restart-clusters* remaining-clusters))
-             (dolist (restart cluster)
-               (when (and (or (eq restart name)
-                              (eq (restart-name restart) name))
-                          (restart-visible-p restart condition))
-                 (return-from find-restart restart))))))
+(defgeneric find-restart (name &optional condition)
+  (:documentation "Finds the first currently established restart with the
+provided name. If the optional condition argument is supplied, the search skips
+over all restarts which are associated with conditions other than the provided
+one."))
+
+(defmethod find-restart (name &optional condition)
+  "Walks all restart clusters and returns the first restart with the correct
+name and visibility status."
+  (dolist (cluster *restart-clusters*)
+    (dolist (restart cluster)
+      (when (and (or (eq restart name)
+                     (eq (restart-name restart) name))
+                 (restart-visible-p restart condition))
+        (return-from find-restart restart)))))
 
 (defgeneric invoke-restart (restart &rest arguments)
   (:documentation "Invokes a restart with the provided argument. If the restart
 is provided by name, this function calls FIND-RESTART with the provided name
 first and signals an error if no such restart is available. If the restart
-returns normally, returns the value returned by the restart function.")
-  (:method (restart &rest arguments)
-    (declare (ignore arguments))
-    (error "Wrong thing passed to INVOKE-RESTART: ~S" restart))
-  (:method ((restart symbol) &rest arguments)
-    (let ((real-restart (or (find-restart restart)
-                            (error "Restart ~S is not active." restart))))
-      (apply #'invoke-restart real-restart arguments)))
-  (:method ((restart restart) &rest arguments)
-    (apply (restart-function restart) arguments)))
+returns normally, returns the value returned by the restart function."))
+
+(defmethod invoke-restart (restart &rest arguments)
+  "Signal an error that an invalid argument has been passed to INVOKE-RESTART."
+  (declare (ignore arguments))
+  (error "Wrong thing passed to INVOKE-RESTART: ~S" restart))
+
+(defmethod invoke-restart ((restart symbol) &rest arguments)
+  "Find the restart with the provided name and invoke it."
+  (let ((real-restart (or (find-restart restart)
+                          (error "Restart ~S is not active." restart))))
+    (apply #'invoke-restart real-restart arguments)))
+
+(defmethod invoke-restart ((restart restart) &rest arguments)
+  "Apply the restart function to the provided arguments."
+  (apply (restart-function restart) arguments))
 
 (defgeneric invoke-restart-interactively (restart)
   (:documentation "Invokes a restart after calling the restart's interactive
 function to retrieve a list of arguments for invoking the restart. If the
 restart is provided by name, this function calls FIND-RESTART with the provided
 name first and signals an error if no such restart is available. If the restart
-returns normally, returns the value returned by the restart function.")
-  (:method (restart)
-    (error "Wrong thing passed to INVOKE-RESTART-INTERACTIVELY: ~S" restart))
-  (:method ((restart symbol))
-    (let ((real-restart (or (find-restart restart)
-                            (error "Restart ~S is not active." restart))))
-      (invoke-restart-interactively real-restart)))
-  (:method ((restart restart))
-    (let* ((interactive-function (restart-interactive-function restart))
-           (arguments (if interactive-function
-                          (funcall interactive-function)
-                          '())))
-      (apply (restart-function restart) arguments))))
+returns normally, returns the value returned by the restart function."))
+
+(defmethod invoke-restart-interactively (restart)
+  "Signal an error that an invalid argument has been passed to
+INVOKE-RESTART-INTERACTIVELY."
+  (error "Wrong thing passed to INVOKE-RESTART-INTERACTIVELY: ~S" restart))
+
+(defmethod invoke-restart-interactively ((restart symbol))
+  "Find the restart with the provided name and invoke it."
+  (let ((real-restart (or (find-restart restart)
+                          (error "Restart ~S is not active." restart))))
+    (invoke-restart-interactively real-restart)))
+
+(defmethod invoke-restart-interactively ((restart restart))
+  "Call the restart's interactive function to obtain the list of arguments and
+apply the restart functions to them."
+  (let* ((interactive-function (restart-interactive-function restart))
+         (arguments (if interactive-function
+                        (funcall interactive-function)
+                        '())))
+    (apply (restart-function restart) arguments)))
 
 ;;; RESTART-BIND
 

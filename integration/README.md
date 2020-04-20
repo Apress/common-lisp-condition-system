@@ -57,7 +57,9 @@ For example, if we would like to wrap `cl:type-error` into a new PCS condition t
                   :expected-type (cl:type-error-expected-type condition)))
 ```
 
-The function `host-restart-to-pcs` is also provided for completeness in cases when the user might want to manually translate a host restart object to a PCS restart. It is however not user-extensible, since restart objects, as defined by ANSI CL, are not user-extensible themselves.
+The restart type `host-restart`, accessor `host-restart-wrapped-restart`, and function `host-restart-to-pcs` is also provided for completeness in cases when the user might want to manually translate a host restart object to a PCS restart. It is however not user-extensible, since restart objects, as defined by ANSI CL, are not user-extensible themselves.
+
+TODO docstrings
 
 ## Tests
 

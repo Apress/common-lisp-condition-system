@@ -20,18 +20,20 @@
   good)
 
 (deftest debugger.report.1
-  (let ((condition (make-condition 'condition)))
+  (let ((*package* (find-package :keyword))
+        (condition (make-condition 'condition)))
     (run-debugger-command :report "" condition))
-  ";; Debugger level 0 entered on CONDITION:
-;; Condition CONDITION was signaled.
+  ";; Debugger level 0 entered on PORTABLE-CONDITION-SYSTEM:CONDITION:
+;; Condition PORTABLE-CONDITION-SYSTEM:CONDITION was signaled.
 ")
 
 (deftest debugger.report.2
-  (let ((portable-condition-system::*debug-level* 42)
+  (let ((*package* (find-package :keyword))
+        (portable-condition-system::*debug-level* 42)
         (condition (make-condition 'type-error :datum 42
                                                :expected-type :keyword)))
     (run-debugger-command :report "" condition))
-  ";; Debugger level 42 entered on TYPE-ERROR:
+  ";; Debugger level 42 entered on PORTABLE-CONDITION-SYSTEM:TYPE-ERROR:
 ;; The value
 ;;   42
 ;; is not of type
@@ -39,13 +41,14 @@
 ")
 
 (deftest debugger.report.3
-  (let* ((error-fn (lambda (&rest args)
+  (let* ((*package* (find-package :keyword))
+         (error-fn (lambda (&rest args)
                      (declare (ignore args))
                      (error "Error reporting condition")))
          (condition (make-condition 'simple-condition
                                     :format-control error-fn)))
     (run-debugger-command :report "" condition))
-  ";; Debugger level 0 entered on SIMPLE-CONDITION:
+  ";; Debugger level 0 entered on PORTABLE-CONDITION-SYSTEM:SIMPLE-CONDITION:
 ;; #<error while reporting condition>
 ")
 
