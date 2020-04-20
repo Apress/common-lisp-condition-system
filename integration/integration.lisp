@@ -69,25 +69,25 @@
 
 ;;; Host restarts
 
-(defstruct (cl-restart (:include restart))
+(defstruct (host-restart (:include restart))
   (:wrapped-restart (error "WRAPPED-RESTART required.")))
 
-(defmethod invoke-restart ((restart cl-restart) &rest arguments)
-  (cl:invoke-restart (cl-restart-wrapped-restart restart) arguments))
+(defmethod invoke-restart ((restart host-restart) &rest arguments)
+  (cl:invoke-restart (host-restart-wrapped-restart restart) arguments))
 
-(defmethod invoke-restart-interactively ((restart cl-restart))
-  (cl:invoke-restart-interactively (cl-restart-wrapped-restart restart)))
+(defmethod invoke-restart-interactively ((restart host-restart))
+  (cl:invoke-restart-interactively (host-restart-wrapped-restart restart)))
 
-(defun cl-restart-to-pcs (cl-restart)
-  (make-cl-restart
-   :name (cl:restart-name cl-restart)
-   :function (lambda (&rest args) (apply #'cl:invoke-restart cl-restart args))
-   :report-function (lambda (stream) (format stream "(*) ~A" cl-restart))
-   :wrapped-restart cl-restart))
+(defun host-restart-to-pcs (host-restart)
+  (make-host-restart
+   :name (cl:restart-name host-restart)
+   :function (lambda (&rest args) (apply #'cl:invoke-restart host-restart args))
+   :report-function (lambda (stream) (format stream "(*) ~A" host-restart))
+   :wrapped-restart host-restart))
 
 (defun call-with-host-restarts (cl-condition thunk)
-  (let* ((cl-restarts (cl:compute-restarts cl-condition))
-         (restarts (mapcar #'cl-restart-to-pcs cl-restarts))
+  (let* ((host-restarts (cl:compute-restarts cl-condition))
+         (restarts (mapcar #'host-restart-to-pcs host-restarts))
          (portable-condition-system::*restart-clusters*
            (append portable-condition-system::*restart-clusters*
                    (list restarts))))
