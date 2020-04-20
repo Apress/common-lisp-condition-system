@@ -47,7 +47,7 @@
 ;;; therefore this test will fail if the integration system is NOT installed.
 
 (deftest abort.5
-  (if (find-package '#:portable-condition-system/integration)
+  (if (find-package '#:portable-condition-system.integration)
       (signals-error
        (let ((c1 (make-condition 'error))
              (c2 (make-condition 'error)))

@@ -1,6 +1,6 @@
 ;;;; integration/portable-condition-system.integration.asd
 
-(asdf:defsystem #:portable-condition-system/integration
+(asdf:defsystem #:portable-condition-system.integration
   :description "Integrates PCS with the host condition system"
   :author "Michał \"phoe\" Herda <phoe@disroot.org>"
   :license  "CC0"

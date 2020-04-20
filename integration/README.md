@@ -4,11 +4,15 @@
 
 The task of integrating PCS with the host Lisp's one is handled by the ASDF system `portable-condition-system.integration` which loads a package with the same name.
 
-Executing the `install` function from that package installs a system-wide debugger defined in PCS. Executing `trivial-custom-debugger:with-debugger` with the `portable-condition-system.integration:debugger` function changes the debugger within dynamic extent only.
+Executing the `install` function from that package installs a system-wide debugger defined in PCS. Executing `trivial-custom-debugger:with-debugger` with the `portable-condition-system.integration:debugger` function changes the debugger within dynamic scope only.
 
 This system additionally contains a translation layer which translates condition objects and restarts from the host's condition system into condition objects and restarts used by this system's debugger for better integration of the host condition system within the PCS debugger.
 
 ## Details
+
+TODO
+
+## Extending
 
 TODO
 

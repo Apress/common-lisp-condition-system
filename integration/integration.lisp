@@ -23,12 +23,13 @@
 
 (define-condition foreign-error (foreign-condition error) ())
 
-(defun cl-condition-to-pcs (condition)
-  (let ((type (etypecase condition
-                (cl:error 'foreign-error)
-                (cl:warning 'foreign-warning)
-                (cl:condition 'foreign-condition))))
-    (make-condition type :condition condition)))
+(defgeneric cl-condition-to-pcs (condition)
+  (:method ((condition cl:error))
+    (make-condition 'foreign-error :condition condition))
+  (:method ((condition cl:warning))
+    (make-condition 'foreign-warning :condition condition))
+  (:method ((condition cl:condition))
+    (make-condition 'foreign-condition :condition condition)))
 
 ;;; Host restarts
 
@@ -108,4 +109,4 @@
       (portable-condition-system::standard-debugger condition))))
 
 (defun install ()
-  (install-debugger #'invoke-debugger-hook))
+  (install-debugger #'debugger))
