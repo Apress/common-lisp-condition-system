@@ -5,7 +5,7 @@
   :author "Kent M. Pitman <kent@nhplace.com>"
   :maintainer "Michał \"phoe\" Herda <phoe@disroot.org>"
   :license  "CC0"
-  :version "0.0.1"
+  :version "1.0.0"
   :serial t
   :pathname "src"
   :depends-on (#:alexandria
@@ -24,7 +24,7 @@
   :description "Tests for Portable Condition System"
   :author "Michał \"phoe\" Herda <phoe@disroot.org>"
   :license "MIT"
-  :version "0.0.1"
+  :version "1.0.0"
   :serial t
   :pathname "t"
   :depends-on (#:portable-condition-system)

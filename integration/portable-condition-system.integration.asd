@@ -4,7 +4,7 @@
   :description "Integrates PCS with the host condition system"
   :author "Michał \"phoe\" Herda <phoe@disroot.org>"
   :license  "CC0"
-  :version "0.0.1"
+  :version "1.0.0"
   :serial t
   :depends-on (#:portable-condition-system
                #:trivial-custom-debugger)
@@ -18,7 +18,7 @@
   :description "Tests for Portable Condition System Integration"
   :author "Michał \"phoe\" Herda <phoe@disroot.org>"
   :license "MIT"
-  :version "0.0.1"
+  :version "1.0.0"
   :serial t
   :depends-on (#:portable-condition-system.integration)
   :components ((:file "test")))
