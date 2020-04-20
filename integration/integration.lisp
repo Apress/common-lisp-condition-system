@@ -3,19 +3,27 @@
 (uiop:define-package #:portable-condition-system.integration
   (:use #:common-lisp+portable-condition-system
         #:trivial-custom-debugger)
-  (:export #:debugger
-           #:install))
+  (:export
+   ;; Foreign conditions
+   #:foreign-condition #:foreign-warning #:foreign-error
+   #:foreign-condition-wrapped-condition
+   #:host-condition-to-pcs
+   ;; Restarts
+   #:with-host-restarts
+   ;; Integration
+   #:debugger #:install))
 
 (in-package #:portable-condition-system.integration)
 
-;;; FOREIGN-CONDITION
+;;; Foreign conditions
 
 (defun foreign-condition-report (condition stream)
   (format stream "Foreign condition ~S was signaled:~%~A"
           (type-of condition) (foreign-condition-condition condition)))
 
 (define-condition foreign-condition ()
-  ((condition :reader foreign-condition-condition :initarg :condition))
+  ((wrapped-condition :reader foreign-condition-wrapped-condition
+                      :initarg :wrapped-condition))
   (:default-initargs :condition (error "CONDITION required."))
   (:report foreign-condition-report))
 
@@ -23,13 +31,13 @@
 
 (define-condition foreign-error (foreign-condition error) ())
 
-(defgeneric cl-condition-to-pcs (condition)
+(defgeneric host-condition-to-pcs (condition)
   (:method ((condition cl:error))
-    (make-condition 'foreign-error :condition condition))
+    (make-condition 'foreign-error :wrapped-condition condition))
   (:method ((condition cl:warning))
-    (make-condition 'foreign-warning :condition condition))
+    (make-condition 'foreign-warning :wrapped-condition condition))
   (:method ((condition cl:condition))
-    (make-condition 'foreign-condition :condition condition)))
+    (make-condition 'foreign-condition :wrapped-condition condition)))
 
 ;;; Debugger commands
 
@@ -85,15 +93,15 @@
    :report-function (lambda (stream) (format stream "(*) ~A" host-restart))
    :wrapped-restart host-restart))
 
-(defun call-with-host-restarts (cl-condition thunk)
-  (let* ((host-restarts (cl:compute-restarts cl-condition))
+(defun call-with-host-restarts (host-condition thunk)
+  (let* ((host-restarts (cl:compute-restarts host-condition))
          (restarts (mapcar #'host-restart-to-pcs host-restarts))
          (portable-condition-system::*restart-clusters*
            (append portable-condition-system::*restart-clusters*
                    (list restarts))))
     (funcall thunk)))
 
-(defmacro with-host-restarts ((condition) &body body)
+(defmacro with-host-restarts ((&optional condition) &body body)
   `(call-with-host-restarts ,condition (lambda () ,@body)))
 
 ;;; Integration
@@ -102,10 +110,10 @@
   (let ((*debugger-hook* hook))
     (invoke-debugger condition)))
 
-(defmethod invoke-debugger ((cl-condition cl:condition))
-  (let ((condition (cl-condition-to-pcs cl-condition)))
+(defmethod invoke-debugger ((host-condition cl:condition))
+  (let ((condition (host-condition-to-pcs host-condition)))
     (signal condition)
-    (with-host-restarts (cl-condition)
+    (with-host-restarts (host-condition)
       (portable-condition-system::standard-debugger condition))))
 
 (defun install ()
