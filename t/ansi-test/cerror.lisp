@@ -61,10 +61,10 @@
 ;;; Program error cases
 
 (deftest cerror.error.1
-  (signals-error (cerror) cl:program-error)
+  (signals-error (cerror) program-error-type)
   t)
 
 (deftest cerror.error.2
-  (signals-error (cerror "foo") cl:program-error)
+  (signals-error (cerror "foo") program-error-type)
   t)
 

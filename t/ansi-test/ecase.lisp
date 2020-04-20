@@ -172,15 +172,15 @@
   :good)
 
 (deftest ecase.error.1
-  (signals-error (funcall (macro-function 'ecase)) cl:program-error)
+  (signals-error (funcall (macro-function 'ecase)) program-error-type)
   t)
 
 (deftest ecase.error.2
   (signals-error (funcall (macro-function 'ecase) '(ecase t))
-                 cl:program-error)
+                 program-error-type)
   t)
 
 (deftest ecase.error.3
   (signals-error (funcall (macro-function 'ecase) '(ecase t) nil nil)
-                 cl:program-error)
+                 program-error-type)
   t)

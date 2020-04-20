@@ -101,18 +101,18 @@
 
 (deftest ctypecase.error.1
   (signals-error (funcall (macro-function 'ctypecase))
-                 cl:program-error)
+                 program-error-type)
   t)
 
 (deftest ctypecase.error.2
   (signals-error (funcall (macro-function 'ctypecase)
                           '(ctypecase t))
-                 cl:program-error)
+                 program-error-type)
   t)
 
 (deftest ctypecase.error.3
   (signals-error (funcall (macro-function 'ctypecase)
                           '(ctypecase t)
                           nil nil)
-                 cl:program-error)
+                 program-error-type)
   t)

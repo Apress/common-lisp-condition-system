@@ -1,4 +1,4 @@
-;;;; t/framework.lisp
+;;;; t/ansi-test-support.lisp
 
 (in-package #:portable-condition-system/test)
 

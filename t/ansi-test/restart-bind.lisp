@@ -175,7 +175,7 @@
    (restart-bind
        ((foo #'(lambda () t)))
      (invoke-restart 'foo 'a))
-   cl:program-error)
+   program-error-type)
   t)
 
 (deftest restart-bind.error.2
@@ -183,7 +183,7 @@
    (restart-bind
        ((foo #'(lambda (x) x)))
      (invoke-restart 'foo))
-   cl:program-error)
+   program-error-type)
   t)
 
 (deftest restart-bind.error.3
@@ -191,7 +191,7 @@
    (restart-bind
        ((foo #'identity))
      (invoke-restart 'foo))
-   cl:program-error)
+   program-error-type)
   t)
 
 (deftest restart-bind.23

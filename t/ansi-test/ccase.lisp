@@ -195,15 +195,15 @@
 
 (deftest ccase.error.1
   (signals-error (funcall (macro-function 'ccase))
-                 cl:program-error)
+                 program-error-type)
   t)
 
 (deftest ccase.error.2
   (signals-error (funcall (macro-function 'ccase) '(ccase t))
-                 cl:program-error)
+                 program-error-type)
   t)
 
 (deftest ccase.error.3
   (signals-error (funcall (macro-function 'ccase) '(ccase t) nil nil)
-                 cl:program-error)
+                 program-error-type)
   t)

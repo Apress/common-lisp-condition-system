@@ -29,7 +29,7 @@
                                 (declare (ignore args))
                                 (return-from done 'bad))))
        (invoke-debugger)))
-   cl:program-error)
+   program-error-type)
   t)
 
 (deftest invoke-debugger.error.2
@@ -39,7 +39,7 @@
                                 (declare (ignore args))
                                 (return-from done 'bad))))
        (invoke-debugger (make-condition 'simple-error) nil)))
-   cl:program-error)
+   program-error-type)
   t)
 
 ;;; If the debugger hook function expects the wrong number
@@ -50,19 +50,19 @@
   (signals-error
    (let ((*debugger-hook* #'(lambda () nil)))
      (invoke-debugger (make-condition 'simple-error)))
-   cl:program-error)
+   program-error-type)
   t)
 
 (deftest invoke-debugger.error.4
   (signals-error
    (let ((*debugger-hook* #'(lambda (c) c)))
      (invoke-debugger (make-condition 'simple-error)))
-   cl:program-error)
+   program-error-type)
   t)
 
 (deftest invoke-debugger.error.5
   (signals-error
    (let ((*debugger-hook* #'(lambda (c hook x) (list c hook x))))
      (invoke-debugger (make-condition 'simple-error)))
-   cl:program-error)
+   program-error-type)
   t)

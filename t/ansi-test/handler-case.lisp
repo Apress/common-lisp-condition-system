@@ -162,14 +162,14 @@
   (signals-error
    (cl:handler-bind ((cl:warning #'cl:muffle-warning))
      (eval '(handler-case (values 1 2) (:no-error (x) x))))
-   cl:program-error)
+   program-error-type)
   t)
 
 (deftest handler-case.24
   (signals-error
    (cl:handler-bind ((cl:warning #'cl:muffle-warning))
      (eval '(handler-case (values) (:no-error (x) x))))
-   cl:program-error)
+   program-error-type)
   t)
 
 (deftest handler-case.25

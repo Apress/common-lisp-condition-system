@@ -27,5 +27,5 @@
 ;;; Error tests
 
 (deftest make-condition.error.1
-  (signals-error (make-condition) cl:program-error)
+  (signals-error (make-condition) program-error-type)
   t)

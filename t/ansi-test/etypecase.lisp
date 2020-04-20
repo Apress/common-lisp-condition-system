@@ -136,17 +136,17 @@
 
 (deftest etypecase.error.1
   (signals-error (funcall (macro-function 'etypecase))
-                 cl:program-error)
+                 program-error-type)
   t)
 
 (deftest etypecase.error.2
   (signals-error (funcall (macro-function 'etypecase)
                           '(etypecase t))
-                 cl:program-error)
+                 program-error-type)
   t)
 
 (deftest etypecase.error.3
   (signals-error (funcall (macro-function 'etypecase)
                           '(etypecase t) nil nil)
-                 cl:program-error)
+                 program-error-type)
   t)

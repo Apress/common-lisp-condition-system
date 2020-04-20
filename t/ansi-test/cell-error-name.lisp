@@ -30,10 +30,10 @@
 
 
 (deftest cell-error-name.error.1
-  (signals-error (cell-error-name) cl:program-error)
+  (signals-error (cell-error-name) program-error-type)
   t)
 
 (deftest cell-error-name.error.2
   (signals-error (cell-error-name (make-condition 'unbound-variable :name 'foo) nil)
-                 cl:program-error)
+                 program-error-type)
   t)

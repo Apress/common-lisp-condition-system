@@ -145,7 +145,7 @@
   t)
 
 (deftest warn.15
-  (signals-error (warn) cl:program-error)
+  (signals-error (warn) program-error-type)
   t)
 
 (deftest warn.16
