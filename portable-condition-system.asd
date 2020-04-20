@@ -30,6 +30,7 @@
   :depends-on (#:portable-condition-system)
   :components ((:file "package")
                (:file "1am")
+               (:file "debugger")
                (:file "ansi-test-data")
                (:file "ansi-test-support")
                (:module "ansi-test"
