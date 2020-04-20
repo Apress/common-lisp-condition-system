@@ -61,7 +61,7 @@ The function `host-restart-to-pcs` is also provided for completeness in cases wh
 
 ## Tests
 
-TODO
+To run the test suite, evaluate `(asdf:test-system :portable-condition-system.integration)` or manually load ASDF system `portable-condition-system.integration/test` and run `(portable-condition-system.integration/test:run)`.
 
 ## Example
 
