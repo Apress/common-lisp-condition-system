@@ -31,35 +31,6 @@
   (:method ((condition cl:condition))
     (make-condition 'foreign-condition :condition condition)))
 
-;;; Host restarts
-
-(defstruct (cl-restart (:include restart))
-  (:wrapped-restart (error "WRAPPED-RESTART required.")))
-
-(defmethod invoke-restart ((restart cl-restart) &rest arguments)
-  (cl:invoke-restart (cl-restart-wrapped-restart restart) arguments))
-
-(defmethod invoke-restart-interactively ((restart cl-restart))
-  (cl:invoke-restart-interactively (cl-restart-wrapped-restart restart)))
-
-(defun cl-restart-to-pcs (cl-restart)
-  (make-cl-restart
-   :name (cl:restart-name cl-restart)
-   :function (lambda (&rest args) (apply #'cl:invoke-restart cl-restart args))
-   :report-function (lambda (stream) (princ cl-restart stream))
-   :wrapped-restart cl-restart))
-
-(defun call-with-host-restarts (cl-condition thunk)
-  (let* ((cl-restarts (cl:compute-restarts cl-condition))
-         (restarts (mapcar #'cl-restart-to-pcs cl-restarts))
-         (portable-condition-system::*restart-clusters*
-           (append portable-condition-system::*restart-clusters*
-                   (list restarts))))
-    (funcall thunk)))
-
-(defmacro with-host-restarts ((condition) &body body)
-  `(call-with-host-restarts ,condition (lambda () ,@body)))
-
 ;;; Debugger commands
 
 (defun invoke-maybe-foreign-restart (stream condition &rest names)
@@ -91,10 +62,39 @@
 (defun help-continue-hook (condition stream)
   (when (and (not (find-restart 'continue condition))
              (find-restart 'cl:continue condition))
-    (format stream "~&;;  :CONTINUE, :Q         Invoke a CONTINUE restart.~%")))
+    (format stream "~&;;  :CONTINUE, :C         Invoke a CONTINUE restart.~%")))
 
 (pushnew #'help-continue-hook portable-condition-system::*help-hooks*)
 (pushnew #'help-abort-hook portable-condition-system::*help-hooks*)
+
+;;; Host restarts
+
+(defstruct (cl-restart (:include restart))
+  (:wrapped-restart (error "WRAPPED-RESTART required.")))
+
+(defmethod invoke-restart ((restart cl-restart) &rest arguments)
+  (cl:invoke-restart (cl-restart-wrapped-restart restart) arguments))
+
+(defmethod invoke-restart-interactively ((restart cl-restart))
+  (cl:invoke-restart-interactively (cl-restart-wrapped-restart restart)))
+
+(defun cl-restart-to-pcs (cl-restart)
+  (make-cl-restart
+   :name (cl:restart-name cl-restart)
+   :function (lambda (&rest args) (apply #'cl:invoke-restart cl-restart args))
+   :report-function (lambda (stream) (princ cl-restart stream))
+   :wrapped-restart cl-restart))
+
+(defun call-with-host-restarts (cl-condition thunk)
+  (let* ((cl-restarts (cl:compute-restarts cl-condition))
+         (restarts (mapcar #'cl-restart-to-pcs cl-restarts))
+         (portable-condition-system::*restart-clusters*
+           (append portable-condition-system::*restart-clusters*
+                   (list restarts))))
+    (funcall thunk)))
+
+(defmacro with-host-restarts ((condition) &body body)
+  `(call-with-host-restarts ,condition (lambda () ,@body)))
 
 ;;; Integration
 
