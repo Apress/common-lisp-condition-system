@@ -82,12 +82,12 @@
 
 ;;; Debugger help
 
-(defun help-abort-hook (stream condition)
+(defun help-abort-hook (condition stream)
   (when (and (not (find-restart 'abort condition))
              (find-restart 'cl:abort condition))
     (format stream "~&;;  :ABORT, :Q         Invoke an ABORT restart.~%")))
 
-(defun help-continue-hook (stream condition)
+(defun help-continue-hook (condition stream)
   (when (and (not (find-restart 'continue condition))
              (find-restart 'cl:continue condition))
     (format stream "~&;;  :CONTINUE, :Q         Invoke a CONTINUE restart.~%")))

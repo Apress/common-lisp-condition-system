@@ -142,12 +142,12 @@ informs the user about that fact."
          (restart (nth n (compute-restarts condition))))
     (if restart
         (invoke-restart-interactively restart)
-        (format stream "~&;; There is no restart with number ~D." n))))
+        (format stream "~&;; There is no restart with number ~D.~%" n))))
 
 (defvar *help-hooks* '()
   "A list of hooks that are called when the :HELP debugger command is invoked.
-Each hook must be a function that accepts a stream that the hook should print to
-and a condition object that the debugger was entered with.")
+Each hook must be a function that accepts a condition object that the debugger
+was entered with and a stream that the hook should print to.")
 
 (define-command :help (stream condition)
   "Prints the debugger help."
@@ -168,10 +168,10 @@ and a condition object that the debugger was entered with.")
   (when (find-restart 'continue condition)
     (format stream "~&;;  :CONTINUE, :C      Invoke a CONTINUE restart.~%"))
   (dolist (hook *help-hooks*)
-    (funcall hook stream condition))
+    (funcall hook condition stream))
   (format stream "~&~
 ;;
-;; Any non-keyword non-integer form is evaluated."))
+;; Any non-keyword non-integer form is evaluated.~%"))
 
 ;;; Debugger implementation
 
