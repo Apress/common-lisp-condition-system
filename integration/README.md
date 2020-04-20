@@ -15,7 +15,9 @@ This system contains a translation layer which translates condition objects and 
 
 The PCS condition type hierarchy and PCS handler stack are completely independent of the host's, meaning that the host `condition` class and PCS `condition` class are distinct and not a subclass of one another. The host's `signal` will not trigger PCS handlers and vice versa.
 
-The host's restart objects are invisible to PCS `compute-restarts`/`find-restart`. A way to make them visible to the PCS restart system is to use the function `call-with-host-restarts` or the macro `with-host-restarts`. This computes the host restart objects, using the optionally provided host condition object, and adds the host restarts to the bottom of the handler stack. This means that PCS restarts will always appear above host restarts. In addition, host restarts are reported with a `(*) ` prepended to their report.
+The host's restart objects are visible to PCS `compute-restarts`/`find-restart` and are always present at the bottom of the handler stack. This means that PCS restarts will always appear above host restarts. In addition, host restarts are reported with a `(*) ` prepended to their report.
+
+The PCS functions `find-restart`, `abort`, `continue`, `muffle-warning`, `store-value`, and `use-value` will now find and invoke host restarts named after their respective symbols from the `common-lisp` package.
 
 The debugger commands `:abort`, `:q`, `:continue`, and `:c` properly recognize the host's `abort` and `continue` restarts.
 
@@ -31,7 +33,7 @@ The reason for that limitation is that the debugger has no means of knowing if i
 
 ------
 
-Another limitation is the fact that the host and PCS handler systems are independent. This means that the host's `signal` will traverse the host handlers only, and that the host's `error` and `cerror` will traverse the host's handlers first, traverse the PCS handlers second (in its wrapped form), and only then enter the PCS debugger. This may mean that the order of traversing handlers will not be the same as the order of binding them if the host's `handler-bind`/`handler-case`/`ignore-errors` are mixed with the PCS versions of these operators.
+Another fact is the fact that the host and PCS handler systems are independent. This means that the host's `signal` will traverse the host handlers only, and that the host's `error` and `cerror` will traverse the host's handlers first, traverse the PCS handlers second (in its wrapped form), and only then enter the PCS debugger. This may mean that the order of traversing handlers will not be the same as the order of binding them if the host's `handler-bind`/`handler-case`/`ignore-errors` are mixed with the PCS versions of these operators.
 
 ---------
 
@@ -58,8 +60,6 @@ For example, if we would like to wrap `cl:type-error` into a new PCS condition t
 ```
 
 The restart type `host-restart`, accessor `host-restart-wrapped-restart`, and function `host-restart-to-pcs` is also provided for completeness in cases when the user might want to manually translate a host restart object to a PCS restart. It is however not user-extensible, since restart objects, as defined by ANSI CL, are not user-extensible themselves.
-
-TODO docstrings
 
 ## Tests
 

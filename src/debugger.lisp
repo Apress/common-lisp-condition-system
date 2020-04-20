@@ -199,5 +199,3 @@ treated as debugger commands and integers are treated as arguments to
     (run-debugger-command :report stream condition)
     (format stream "~&;; Type :HELP for available commands.~%")
     (loop (read-eval-print-command stream condition))))
-
-;;; TODO debugger.3 test is broken, fix it

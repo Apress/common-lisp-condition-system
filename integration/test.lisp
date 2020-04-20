@@ -8,14 +8,19 @@
 
 (in-package #:portable-condition-system.integration/test)
 
-(defvar *tests*
-  '(wrapping.1
-    wrapping.2
-    wrapping.3
-    host-break.1))
+(defparameter *tests*
+  '(wrapping.1 wrapping.2 wrapping.3
+    host-break.1
+    handler-order.1
+    restarts.1
+    restart-order.1 restart-order.2 restart-order.3
+    abort.1 continue.1 muffle-warning.1 store-value.1 use-value.1
+    host-restart-report.1
+    debugger.abort.1 debugger.q.1 debugger.continue.1 debugger.c.1))
 
 (defun run ()
-  (mapc #'funcall *tests*))
+  (mapc #'funcall *tests*)
+  t)
 
 (defun wrapping.1 ()
   (with-debugger (#'debugger)
@@ -136,5 +141,55 @@
     (assert (equal (nreverse list)
                    '(:pcs-bar :pcs-foo :host-bar :host-foo)))))
 
-;; TODO debugger commands with host restarts
-;; TODO host restart report
+(defun abort.1 ()
+  (assert (eql 'good (cl:restart-case (abort)
+                       (cl:abort () 'good)))))
+
+(defun continue.1 ()
+  (assert (eql 'good (cl:restart-case (continue)
+                       (cl:continue () 'good)))))
+
+(defun muffle-warning.1 ()
+  (assert (eql 'good (cl:restart-case (muffle-warning)
+                       (cl:muffle-warning () 'good)))))
+
+(defun store-value.1 ()
+  (assert (eql 'good (cl:restart-case (store-value 'good)
+                       (cl:store-value (value) value)))))
+
+(defun use-value.1 ()
+  (assert (eql 'good (cl:restart-case (use-value 'good)
+                       (cl:use-value (value) value)))))
+
+(defun host-restart-report.1 ()
+  (assert (string= "(*) Foo"
+                   (cl:restart-case (princ-to-string (find-restart 'abort))
+                     (cl:abort () :report "Foo")))))
+
+(defun run-debugger-command
+    (command input-string &optional condition &rest args)
+  (with-input-from-string (input input-string)
+    (with-output-to-string (output)
+      (let ((stream (make-two-way-stream input output)))
+        (apply #'portable-condition-system::run-debugger-command
+               command stream condition args)))))
+
+(defun debugger.abort.1 ()
+  (assert (eql (cl:restart-case (run-debugger-command :abort "")
+                 (cl:abort () 'good))
+               'good)))
+
+(defun debugger.q.1 ()
+  (assert (eql (cl:restart-case (run-debugger-command :q "")
+                 (cl:abort () 'good))
+               'good)))
+
+(defun debugger.continue.1 ()
+  (assert (eql (cl:restart-case (run-debugger-command :continue "")
+                 (cl:continue () 'good))
+               'good)))
+
+(defun debugger.c.1 ()
+  (assert (eql (cl:restart-case (run-debugger-command :c "")
+                 (cl:continue () 'good))
+               'good)))

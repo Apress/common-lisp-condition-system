@@ -61,42 +61,42 @@
   t)
 
 (deftest debugger.abort.1
-  (run-debugger-command :abort "" (make-condition 'condition))
+  (run-debugger-command :abort "")
   ";; There is no active ABORT restart.
 ")
 
 (deftest debugger.abort.2
-  (restart-case (run-debugger-command :abort "" (make-condition 'condition))
+  (restart-case (run-debugger-command :abort "")
     (abort () 'good))
   good)
 
 (deftest debugger.q.1
-  (run-debugger-command :q "" (make-condition 'condition))
+  (run-debugger-command :q "")
   ";; There is no active ABORT restart.
 ")
 
 (deftest debugger.q.2
-  (restart-case (run-debugger-command :q "" (make-condition 'condition))
+  (restart-case (run-debugger-command :q "")
     (abort () 'good))
   good)
 
 (deftest debugger.continue.1
-  (run-debugger-command :continue "" (make-condition 'condition))
+  (run-debugger-command :continue "")
   ";; There is no active CONTINUE restart.
 ")
 
 (deftest debugger.continue.2
-  (restart-case (run-debugger-command :continue "" (make-condition 'condition))
+  (restart-case (run-debugger-command :continue "")
     (continue () 'good))
   good)
 
 (deftest debugger.c.1
-  (run-debugger-command :c "" (make-condition 'condition))
+  (run-debugger-command :c "")
   ";; There is no active CONTINUE restart.
 ")
 
 (deftest debugger.c.2
-  (restart-case (run-debugger-command :c "" (make-condition 'condition))
+  (restart-case (run-debugger-command :c "")
     (continue () 'good))
   good)
 
