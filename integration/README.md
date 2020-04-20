@@ -25,8 +25,8 @@ TODO
 Example integrated debugger session:
 
 ```lisp
-PORTABLE-CONDITION-SYSTEM.INTEGRATION> (with-debugger (#'debugger)
-                                         (+ 2 :two))
+INTEGRATION> (with-debugger (#'debugger)
+               (+ 2 :two))
 ;; Debugger level 1 entered on FOREIGN-ERROR:
 ;; Foreign condition FOREIGN-ERROR was signaled:
 ;; Value of :TWO in (+ 2 :TWO) is :TWO, not a NUMBER.
@@ -34,8 +34,9 @@ PORTABLE-CONDITION-SYSTEM.INTEGRATION> (with-debugger (#'debugger)
 [1] Debug> :abort
 ; Evaluation aborted on #<COMMON-LISP:SIMPLE-TYPE-ERROR expected-type: NUMBER datum: :TWO>.
 
-PORTABLE-CONDITION-SYSTEM.INTEGRATION> (with-debugger (#'debugger)
-                                         (cl:break "This is hopelessly broken."))
+INTEGRATION> (with-debugger (#'debugger)
+               (cl:break "This is hopelessly broken."))
+
 ;; Debugger level 1 entered on FOREIGN-CONDITION:
 ;; Foreign condition FOREIGN-CONDITION was signaled:
 ;; This is hopelessly broken.
@@ -43,12 +44,14 @@ PORTABLE-CONDITION-SYSTEM.INTEGRATION> (with-debugger (#'debugger)
 [1] Debug> :restarts
 
 ;; Available restarts:
-;;  0: [CONTINUE] Return from COMMON-LISP:BREAK.
-;;  1: [RETRY   ] Retry SLIME REPL evaluation request.
-;;  2: [ABORT   ] Return to SLIME's top level.
-;;  3: [ABORT   ] abort thread (#<THREAD "repl-thread" RUNNING {100CBF9DE3}>)
+;;  0: [CONTINUE] (*) Return from COMMON-LISP:BREAK.
+;;  1: [RETRY   ] (*) Retry SLIME REPL evaluation request.
+;;  2: [ABORT   ] (*) Return to SLIME's top level.
+;;  3: [ABORT   ] (*) abort thread (#<THREAD "repl-thread" RUNNING {100CBF9DE3}>)
 [1] Debug> 2
 ; Evaluation aborted on NIL.
+
+INTEGRATION>
 ```
 
 ## License

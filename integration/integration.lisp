@@ -33,7 +33,7 @@
 
 ;;; Debugger commands
 
-(defun invoke-maybe-foreign-restart (stream condition &rest names)
+(defun invoke-maybe-foreign-restart (stream condition names)
   (let* ((restarts (compute-restarts condition))
          (restart (find-if (lambda (x) (member x names))
                            restarts :key #'restart-name)))
@@ -82,7 +82,7 @@
   (make-cl-restart
    :name (cl:restart-name cl-restart)
    :function (lambda (&rest args) (apply #'cl:invoke-restart cl-restart args))
-   :report-function (lambda (stream) (princ cl-restart stream))
+   :report-function (lambda (stream) (format stream "(*) ~A" cl-restart))
    :wrapped-restart cl-restart))
 
 (defun call-with-host-restarts (cl-condition thunk)
