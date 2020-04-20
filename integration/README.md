@@ -4,16 +4,18 @@
 
 The task of integrating PCS with the host Lisp's one is handled by the ASDF system `portable-condition-system.integration` which loads a package with the same name.
 
-* Executing the `install` function from that package installs a system-wide debugger defined in PCS.
-* Executing `trivial-custom-debugger:with-debugger` with the `portable-condition-system.integration:debugger` function changes the debugger within dynamic scope only.
+Installing the debugger is handled via [`trivial-custom-debugger`](https://github.com/phoe/trivial-custom-debugger):
 
-This system additionally contains a translation layer which translates condition objects and restarts from the host's condition system into condition objects and restarts used by this system's debugger for better integration of the host condition system within the PCS debugger.
+* executing `trivial-custom-debugger:install` with the `debugger` function installs the PCS debugger system-wide in the Lisp image,
+* executing `trivial-custom-debugger:with-debugger` with the `debugger` function installs the PCS debugger within dynamic scope of the executed form.
+
+This system contains a translation layer which translates condition objects and restarts from the host's condition system into condition objects and restarts used by this system's debugger for better integration of the host condition system within the PCS debugger.
 
 ## Details
 
 The PCS condition type hierarchy and PCS handler stack are completely independent of the host's, meaning that the host `condition` class and PCS `condition` class are distinct and not a subclass of one another. The host's `signal` will not trigger PCS handlers and vice versa.
 
-The host's restart objects are invisible to PCS `compute-restarts`/`find-restart` unless the wrapper macro `with-host-restarts` is used. This macro computes the host restarts using the optionally provided host condition object and adds the host restarts to the bottom of the handler stack, which means that PCS restarts will always appear above host restarts. In addition, host restarts are reported with a `(*) ` prepended to their report.
+The host's restart objects are invisible to PCS `compute-restarts`/`find-restart`. A way to make them visible to the PCS restart system is to use the function `call-with-host-restarts` or the macro `with-host-restarts`. This computes the host restart objects, using the optionally provided host condition object, and adds the host restarts to the bottom of the handler stack. This means that PCS restarts will always appear above host restarts. In addition, host restarts are reported with a `(*) ` prepended to their report.
 
 The debugger commands `:abort`, `:q`, `:continue`, and `:c` properly recognize the host's `abort` and `continue` restarts.
 
@@ -21,11 +23,19 @@ The PCS debugger is allowed to be entered with a host condition object. In such 
 
 ## Limitations
 
-The main limitation of the integration system is that when the debugger is entered with a host condition, the resulting PCS condition is always signaled and therefore allows the PCS handler stack to handle the condition.
-
-The reason for that is that the debugger has no means of knowing if it was called directly (via `invoke-debugger` or `break`) or from a signaling function (via `error` or `cerror`). Therefore, we are required to define the behaviour when the debugger is entered with a host condition in terms of never signaling the wrapped PCS condition, or always signaling it. The former case is unacceptable, since the host's `error` function will then make it impossible to define a handler that catches all errors, host or foreign ones, and therefore break, among others, PCS `ignore-errors` and `handler-case`. Therefore, we choose the latter case, and always signal the translated PCS condition when entering the debugger.
+The main limitation of the integration system is that when the debugger is entered with a host condition, the resulting PCS condition is always signaled, which allows the PCS handler stack to handle the condition.
 
 This has an unfortunate site effect of interfering with the host's `invoke-debugger` and `break` functions, since it becomes possible for the debugger entry to be handled by the PCS handler stack. This will be the case if the host condition object that the debugger was entered with becomes translated to a `foreign-condition` for which a PCS handler is defined. For a solution to this problem, please use the PCS-provided `invoke-debugger` and `break` functions instead of the host's original ones.
+
+The reason for that limitation is that the debugger has no means of knowing if it was called directly (via `invoke-debugger` or `break`) or from a signaling function (via `error` or `cerror`). Therefore, we are required to define the behaviour when the debugger is entered with a host condition in terms of never signaling the wrapped PCS condition, or always signaling it. The former case is unacceptable, since the host's `error` function will then make it impossible to define a handler that catches all errors, host or foreign ones, and therefore break, among others, PCS `ignore-errors` and `handler-case`. Therefore, we choose the latter case, and always signal the translated PCS condition when entering the debugger.
+
+------
+
+Another limitation is the fact that the host and PCS handler systems are independent. This means that the host's `signal` will traverse the host handlers only, and that the host's `error` and `cerror` will traverse the host's handlers first, traverse the PCS handlers second (in its wrapped form), and only then enter the PCS debugger. This may mean that the order of traversing handlers will not be the same as the order of binding them if the host's `handler-bind`/`handler-case`/`ignore-errors` are mixed with the PCS versions of these operators.
+
+---------
+
+A similar limitation occurs with restarts. The PCS `compute-restarts` will list all host restarts below PCS restarts. This limitation is mitigated by the part that all restarts are nonetheless available to be invoked; only their order on the restart list is not respected if the host's `restart-bind`/`restart-case`/`with-simple-restart` are mixed with the PCS versions of these operators.
 
 ## Extending
 
@@ -46,6 +56,8 @@ For example, if we would like to wrap `cl:type-error` into a new PCS condition t
                   :datum (cl:type-error-datum condition)
                   :expected-type (cl:type-error-expected-type condition)))
 ```
+
+The function `host-restart-to-pcs` is also provided for completeness in cases when the user might want to manually translate a host restart object to a PCS restart. It is however not user-extensible, since restart objects, as defined by ANSI CL, are not user-extensible themselves.
 
 ## Tests
 

@@ -9,9 +9,10 @@
    #:foreign-condition-wrapped-condition
    #:host-condition-to-pcs
    ;; Restarts
-   #:with-host-restarts
+   #:call-with-host-restarts #:with-host-restarts
+   #:host-restart-to-pcs
    ;; Integration
-   #:debugger #:install))
+   #:debugger))
 
 (in-package #:portable-condition-system.integration)
 
@@ -106,15 +107,12 @@
 
 ;;; Integration
 
-(defun debugger (condition hook)
-  (let ((*debugger-hook* hook))
-    (invoke-debugger condition)))
-
 (defmethod invoke-debugger ((host-condition cl:condition))
   (let ((condition (host-condition-to-pcs host-condition)))
     (signal condition)
     (with-host-restarts (host-condition)
       (portable-condition-system::standard-debugger condition))))
 
-(defun install ()
-  (install-debugger #'debugger))
+(defun debugger (condition hook)
+  (let ((*debugger-hook* hook))
+    (invoke-debugger condition)))
