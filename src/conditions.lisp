@@ -244,7 +244,10 @@ the signaled error."
 
 (defgeneric coerce-to-condition (datum arguments default-type name)
   (:documentation "Attempts to coerce the provided arguments into a condition
-object, ."))
+object. The DEFAULT-TYPE argument describes the default condition type that
+should be created if no condition type can be inferred from DATUM; the NAME
+argument is the name of the coercing operator and is used during invalid
+coercions to properly report the error."))
 
 (defmethod coerce-to-condition ((datum condition) arguments default-type name)
   "Returns the condition object that was passed to the function. If arguments
