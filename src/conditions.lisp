@@ -2,6 +2,24 @@
 
 (in-package #:portable-condition-system)
 
+;;; Class CONDITION
+
+(defclass condition () ()
+  (:documentation "The base condition type that is the supertype of all
+condition objects."))
+
+(defmethod print-object ((condition condition) stream)
+  "Default condition reporting method which prints the condition type."
+  (format stream "Condition ~S was signaled." (type-of condition)))
+
+(defmethod print-object :around ((condition condition) stream)
+  "Prints of reports a condition to the provided stream. If *PRINT-ESCAPE* is
+bound, the condition is print unreadably; otherwise, it is reported by means of
+calling the next printing method."
+  (if *print-escape*
+      (print-unreadable-object (condition stream :type t :identity t))
+      (call-next-method)))
+
 ;;; DEFINE-CONDITION
 
 (defun make-condition-report-method (name report-option)
@@ -32,24 +50,6 @@ defining a PRINT-object method on the newly created class."
   "Instantiates a new condition object of the provided type with the provided
 arguments."
   (apply #'make-instance type args))
-
-;;; Class CONDITION
-
-(defclass condition () ()
-  (:documentation "The base condition type that is the supertype of all
-condition objects."))
-
-(defmethod print-object ((condition condition) stream)
-  "Default condition reporting method which prints the condition type."
-  (format stream "Condition ~S was signaled." (type-of condition)))
-
-(defmethod print-object :around ((condition condition) stream)
-  "Prints of reports a condition to the provided stream. If *PRINT-ESCAPE* is
-bound, the condition is print unreadably; otherwise, it is reported by means of
-calling the next printing method."
-  (if *print-escape*
-      (print-unreadable-object (condition stream :type t :identity t))
-      (call-next-method)))
 
 ;;; Correctable assertions - utilities
 
