@@ -14,6 +14,7 @@
                (:file "restarts")
                (:file "conditions")
                (:file "condition-definitions")
+               (:file "assertions")
                (:file "handlers")
                (:file "debugger"))
   :in-order-to ((test-op (load-op #:portable-condition-system/test)))
