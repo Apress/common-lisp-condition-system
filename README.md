@@ -5,7 +5,7 @@
 This is an example implementation of the Common Lisp condition system, based on the original condition system implementation by Kent M. Pitman.
 
 This code has been:
-* forked from its [original source location](http://www.nhplace.com/kent/CL/Revision-18.lisp),
+* forked from its [original source location](http://www.nhplace.com/kent/CL/Revision-18.lisp) with the original file copied into [this repository](Revision-18.lisp) for posterity,
 * cleaned to compile on contemporary Common Lisp implementations without warnings,
 * downcased and adjusted to follow modern Lisp style standards,
 * modernized to use ANSI CL functionalities, wherever applicable: for example, `defclass`, `defmethod`, `print-object`, `print-unreadable-object`, or `destructuring-bind`,
