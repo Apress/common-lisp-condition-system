@@ -318,7 +318,6 @@ condition handlers which match the type of the signaled condition."
 MUFFLE-WARNING restart, and signals the condition. If the condition is not
 handled and the MUFFLE-WARNING restart is not invoked, the condition is reported
 to the error output stream."
-  (check-type datum (or warning (not condition)))
   (let ((condition
           (coerce-to-condition datum arguments 'simple-warning 'warn)))
     (check-type condition warning "a warning condition")
