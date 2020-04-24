@@ -39,10 +39,7 @@
 (define-condition storage-condition (serious-condition) ())
 
 (defun report-type-error (condition stream)
-  (format stream "~@<The value ~
-                      ~@:_~2@T~S ~
-                      ~@:_is not of type ~
-                      ~@:_~2@T~S.~:@>"
+  (format stream "~@<The value ~@:_~2@T~S ~@:_is not of type ~@:_~2@T~S.~:@>"
           (type-error-datum condition)
           (type-error-expected-type condition)))
 
@@ -117,18 +114,6 @@
 
 ;;; Non-standard condition types
 
-(define-condition case-failure (type-error)
-  ((name :reader case-failure-name :initarg :name)
-   (possibilities :reader case-failure-possibilities :initarg :possibilities))
-  (:documentation "A condition type signaled when a case assertion
-(such as ECASE, ETYPECASE, CCASE, or CTYPECASE) fails to match its keyform.")
-  (:report
-   (lambda (condition stream)
-     (format stream "~S fell through ~S expression.~%Wanted one of ~:S."
-             (type-error-datum condition)
-             (case-failure-name condition)
-             (case-failure-possibilities condition)))))
-
 (define-condition restart-not-found (control-error)
   ((restart-name :reader restart-not-found-restart-name :initarg :restart-name))
   (:documentation "A condition type signaled when a restart with a given name
@@ -141,3 +126,16 @@ was not found, even thought it was expected.")
   (:documentation "A condition type signaled when the ABORT restart invoked by
 function ABORT failed to transfer control outside of the function.")
   (:report "An ABORT restart failed to transfer control."))
+
+(defun report-case-failure (condition stream)
+  (format stream "~S fell through ~S expression.~%Wanted one of ~:S."
+          (type-error-datum condition)
+          (case-failure-name condition)
+          (case-failure-possibilities condition)))
+
+(define-condition case-failure (type-error)
+  ((name :reader case-failure-name :initarg :name)
+   (possibilities :reader case-failure-possibilities :initarg :possibilities))
+  (:documentation "A condition type signaled when a case assertion
+(such as ECASE, ETYPECASE, CCASE, or CTYPECASE) fails to match its keyform.")
+  (:report report-case-failure))

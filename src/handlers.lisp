@@ -2,66 +2,11 @@
 
 (in-package #:portable-condition-system)
 
-;;; Condition signaling
-
-(defvar *break-on-signals* nil
-  "Declares a condition type for which all signaling functions will call BREAK
-before actually signaling the condition.")
-
-(defvar *handler-clusters* nil
-  "A list containing a list of all handler clusters, where a cluster is a list
-of handlers established together.")
-
-(defun signal (datum &rest arguments)
-  "Coerces the provided arguments to a condition and signals it, calling all
-condition handlers which match the type of the signaled condition."
-  (let ((condition
-          (coerce-to-condition datum arguments 'simple-condition 'signal)))
-    (if (typep condition *break-on-signals*)
-        (break "~A~%Break entered because of *BREAK-ON-SIGNALS*."
-               condition))
-    (loop for (cluster . remaining-clusters) on *handler-clusters*
-          do (let ((*handler-clusters* remaining-clusters))
-               (dolist (handler cluster)
-                 (when (typep condition (car handler))
-                   (funcall (cdr handler) condition)))))))
-
-(defun warn (datum &rest arguments)
-  "Coerces the provided arguments to a warning condition, establishes a
-MUFFLE-WARNING restart, and signals the condition. If the condition is not
-handled and the MUFFLE-WARNING restart is not invoked, the condition is reported
-to the error output stream."
-  (let ((condition
-          (coerce-to-condition datum arguments 'simple-warning 'warn)))
-    (check-type condition warning "a warning condition")
-    (with-simple-restart (muffle-warning "Muffle the warning.")
-      (signal condition)
-      (format *error-output* "~&;; Warning:~%~A~%" condition))
-    nil))
-
-(defun error (datum &rest arguments)
-  "Coerces the provided arguments to an error condition and signals it. If the
-condition is not handled, invokes the debugger with that condition."
-  (let ((condition (coerce-to-condition datum arguments 'simple-error 'error)))
-    (signal condition)
-    (invoke-debugger condition)))
-
-(defun cerror (continue-string datum &rest arguments)
-  "Coerces the provided arguments to a warning condition, establishes a CONTINUE
-restart, and signals the condition. If the condition is not handled, invokes the
-debugger with that condition, allowing execution to continue if the CONTINU."
-  (with-simple-restart
-      (continue "~A"(apply #'format nil continue-string arguments))
-    (apply #'error datum arguments))
-  nil)
-
 ;;; HANDLER-BIND
 
 (defmacro handler-bind (bindings &body forms)
   "Executes the body forms in a dynamic context where the newly established
 handlers are available."
-  (unless (every (lambda (x) (and (listp x) (= (length x) 2))) bindings)
-    (error "Ill-formed handler bindings: ~S" bindings))
   (flet ((make-binding (binding)
            (destructuring-bind (condition-type function) binding
              `(cons ',condition-type ,function))))
@@ -87,16 +32,16 @@ provided."
 
 ;;; HANDLER-CASE - :NO-ERROR not present
 
-(defun handler-case-annotate-case (datum)
-  "Annotates a handler case with a unique go tag."
+(defun handler-case-parse-case (datum)
+  "Parses and annotates a handler case with a unique go tag."
   (destructuring-bind (type lambda-list . forms) datum
     (let ((tag (gensym "HANDLER-TAG")))
-      (list* tag type lambda-list forms))))
+      (list tag type lambda-list forms))))
 
 (defun handler-case-make-handler-binding (temp-var datum)
   "Accepts an annotated HANDLER-CASE case and generates a HANDLER-BIND binding
 based on it."
-  (destructuring-bind (tag type lambda-list . forms) datum
+  (destructuring-bind (tag type lambda-list forms) datum
     (declare (ignore forms))
     (let ((condition (gensym "CONDITION")))
       `(,type (lambda (,condition)
@@ -107,7 +52,7 @@ based on it."
 (defun handler-case-make-handler-case (block-name temp-var datum)
   "Accepts an annotated HANDLER-CASE case and generates a TAGBODY case based on
 it."
-  (destructuring-bind (tag type lambda-list . body) datum
+  (destructuring-bind (tag type lambda-list body) datum
     (declare (ignore type))
     `(,tag
       (return-from ,block-name
@@ -120,14 +65,14 @@ it."
 provided."
   (let ((block-name (gensym "HANDLER-CASE-BLOCK"))
         (temp-var (gensym "HANDLER-CASE-VAR"))
-        (data (mapcar #'handler-case-annotate-case cases)))
+        (data (mapcar #'handler-case-parse-case cases)))
     (flet ((make-handler-binding (datum)
              (handler-case-make-handler-binding temp-var datum))
            (make-handler-case (datum)
              (handler-case-make-handler-case block-name temp-var datum)))
-      `(block ,block-name
-         (let ((,temp-var nil))
-           (declare (ignorable ,temp-var))
+      `(let ((,temp-var nil))
+         (declare (ignorable ,temp-var))
+         (block ,block-name
            (tagbody
               (handler-bind ,(mapcar #'make-handler-binding data)
                 (return-from ,block-name ,form))

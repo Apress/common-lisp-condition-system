@@ -21,7 +21,7 @@
 (defun foreign-condition-report (condition stream)
   "Prints the type of the foreign condition and then reports it.."
   (format stream "Foreign condition ~S was signaled:~%~A"
-          (type-of condition) (foreign-condition-wrapped-condition condition)))
+          (type-of condition) (foreign-condition-foreign-condition condition)))
 
 (defgeneric host-condition-to-pcs (condition)
   (:documentation "Wraps the host condition object inside a proper

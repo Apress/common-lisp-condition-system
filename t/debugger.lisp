@@ -15,8 +15,9 @@
   "4")
 
 (deftest debugger.eval.2
-  (handler-case (run-debugger-command :eval "(error \"42\")")
-    (error () 'good))
+  (let ((*package* (find-package '#:portable-condition-system/test)))
+    (handler-case (run-debugger-command :eval "(error \"42\")")
+      (error () 'good)))
   good)
 
 (deftest debugger.report.1

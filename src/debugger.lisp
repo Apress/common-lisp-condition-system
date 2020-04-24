@@ -2,36 +2,6 @@
 
 (in-package #:portable-condition-system)
 
-;;; Debugger interface
-
-(defvar *debugger-hook* nil
-  "If set, it is called as a function before entry into the debugger with two
-arguments: the condition object that the debugger is invoked with, and itself.")
-
-(defgeneric invoke-debugger (condition)
-  (:documentation "Invokes the debugger with the provided condition object."))
-
-(defmethod invoke-debugger ((condition condition))
-  "If the debugger hook is set, calls it with the condition object and itself.
-Then, enters the standard debugger."
-  (when *debugger-hook*
-    (let ((hook *debugger-hook*)
-          (*debugger-hook* nil))
-      (funcall hook condition hook)))
-  (standard-debugger condition))
-
-(defun break (&optional (format-control "Break") &rest format-arguments)
-  "Binds *debugger-hook* to NIL, establishes a CONTINUE restart, and invokes the
-debugger with a condition object whose report is constructed from the optional
-format control and format arguments."
-  (let ((*debugger-hook* nil))
-    (with-simple-restart (continue "Return from BREAK.")
-      (invoke-debugger
-       (make-condition 'simple-condition
-                       :format-control format-control
-                       :format-arguments format-arguments))))
-  nil)
-
 ;;; DEFINE-COMMAND
 
 (defgeneric run-debugger-command (command stream condition &rest arguments)
@@ -51,12 +21,12 @@ the command itself."))
 form in which the stream, condition, and argument variables are available for
 use inside the method body."
   (check-type name keyword)
-  (let ((command (gensym "COMMAND"))
+  (let ((command-var (gensym "COMMAND"))
         (arguments-var (gensym "ARGUMENTS")))
     (multiple-value-bind (real-body declarations documentation)
         (parse-body body :documentation t)
       `(defmethod run-debugger-command
-           ((,command (eql ,name)) ,stream ,condition &rest ,arguments-var)
+           ((,command-var (eql ,name)) ,stream ,condition &rest ,arguments-var)
          ,@(when documentation `(,documentation))
          ,@declarations
          (destructuring-bind ,arguments ,arguments-var ,@real-body)))))
@@ -93,30 +63,6 @@ object the debugger was entered with."
   "Returns the condition object that the debugger was entered with."
   (run-debugger-command :eval stream condition condition))
 
-(define-command :abort (stream condition)
-  "Finds and invokes the ABORT restart; if no such restart is available, informs
-the user about that fact."
-  (let ((restart (find-restart 'abort condition)))
-    (if restart
-        (invoke-restart-interactively restart)
-        (format stream "~&;; There is no active ABORT restart.~%"))))
-
-(define-command :q (stream condition)
-  "Shorthand for :ABORT."
-  (run-debugger-command :abort stream condition))
-
-(define-command :continue (stream condition)
-  "Finds and invokes the CONTINUE restart; if no such restart is available,
-informs the user about that fact."
-  (let ((restart (find-restart 'continue condition)))
-    (if restart
-        (invoke-restart-interactively restart)
-        (format stream "~&;; There is no active CONTINUE restart.~%"))))
-
-(define-command :c (stream condition)
-  "Shorthand for :CONTINUE."
-  (run-debugger-command :continue stream condition))
-
 (defun restart-max-name-length (restarts)
   "Returns the length of the longest name from the provided restarts."
   (flet ((name-length (restart) (length (string (restart-name restart)))))
@@ -144,6 +90,32 @@ informs the user about that fact."
     (if restart
         (invoke-restart-interactively restart)
         (format stream "~&;; There is no restart with number ~D.~%" n))))
+
+(defun debugger-invoke-restart (name stream condition)
+  "Finds and invokes a restart with the given name; if no such restart is
+available, informs the user about that fact."
+  (let ((restart (find-restart name condition)))
+    (if restart
+        (invoke-restart-interactively restart)
+        (format stream "~&;; There is no active ~A restart.~%" name))))
+
+(define-command :abort (stream condition)
+  "Finds and invokes the ABORT restart; if no such restart is available, informs
+the user about that fact."
+  (debugger-invoke-restart 'abort stream condition))
+
+(define-command :q (stream condition)
+  "Shorthand for :ABORT."
+  (debugger-invoke-restart 'abort stream condition))
+
+(define-command :continue (stream condition)
+  "Finds and invokes the CONTINUE restart; if no such restart is available,
+informs the user about that fact."
+  (debugger-invoke-restart 'continue stream condition))
+
+(define-command :c (stream condition)
+  "Shorthand for :CONTINUE."
+  (debugger-invoke-restart 'continue stream condition))
 
 (defvar *help-hooks* '()
   "A list of hooks that are called when the :HELP debugger command is invoked.
@@ -199,3 +171,33 @@ treated as debugger commands and integers are treated as arguments to
     (run-debugger-command :report stream condition)
     (format stream "~&;; Type :HELP for available commands.~%")
     (loop (read-eval-print-command stream condition))))
+
+;;; Debugger interface
+
+(defvar *debugger-hook* nil
+  "If set, it is called as a function before entry into the debugger with two
+arguments: the condition object that the debugger is invoked with, and itself.")
+
+(defgeneric invoke-debugger (condition)
+  (:documentation "Invokes the debugger with the provided condition object."))
+
+(defmethod invoke-debugger ((condition condition))
+  "If the debugger hook is set, calls it with the condition object and itself.
+Then, enters the standard debugger."
+  (when *debugger-hook*
+    (let ((hook *debugger-hook*)
+          (*debugger-hook* nil))
+      (funcall hook condition hook)))
+  (standard-debugger condition))
+
+(defun break (&optional (format-control "Break") &rest format-arguments)
+  "Binds *debugger-hook* to NIL, establishes a CONTINUE restart, and invokes the
+debugger with a condition object whose report is constructed from the optional
+format control and format arguments."
+  (let ((*debugger-hook* nil))
+    (with-simple-restart (continue "Return from BREAK.")
+      (invoke-debugger
+       (make-condition 'simple-condition
+                       :format-control format-control
+                       :format-arguments format-arguments))))
+  nil)
