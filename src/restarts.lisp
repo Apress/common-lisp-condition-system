@@ -211,10 +211,11 @@ if the respective keyword was not found)."
       (loop
         (let ((thing (first things)))
           (cond
+            ((null (rest things))
+             (return (values things report interactive test)))
             ((eq thing :report) (handle-keyword report :report))
             ((eq thing :interactive) (handle-keyword interactive :interactive))
             ((eq thing :test) (handle-keyword test :test))
-            ((keywordp thing) (error "Unknown RESTART-CASE keyword ~S." thing))
             (t (return (values things report interactive test)))))))))
 
 (defun restart-case-parse-case (case)
