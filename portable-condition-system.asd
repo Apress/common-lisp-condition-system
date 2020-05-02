@@ -5,7 +5,7 @@
   :author "Kent M. Pitman <kent@nhplace.com>"
   :maintainer "Michał \"phoe\" Herda <phoe@disroot.org>"
   :license  "CC0"
-  :version "1.0.0"
+  :version "1.1.0"
   :serial t
   :pathname "src"
   :depends-on (#:alexandria
