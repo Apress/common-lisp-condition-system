@@ -44,7 +44,8 @@
                  (:file "clcs-29-actually-restarting-restarts")
                  (:file "clcs-30-custom-restart-invoking-functions")))
    (:module "05-reporting"
-    :components ((:file "clcs-31-reporting-conditions.lisp")))
+    :components ((:file "clcs-31-reporting-conditions")
+                 (:file "clcs-32-reporting-restarts")))
    (:module "06-warnings"
     :components ())
    (:module "07-assertions"
