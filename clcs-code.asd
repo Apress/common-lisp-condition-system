@@ -29,9 +29,18 @@
                  (:file "clcs-16-protection-against-transfers-of-control")
                  (:file "clcs-17-handler-clustering")))
    (:module "03-choices"
-    :components ())
+    :components ((:file "clcs-18-lets-meet-kate-and-mark")
+                 (:file "clcs-19-choice-1-escape-through-front-door")
+                 (:file "clcs-20-choice-1-escape-through-both-doors")
+                 (:file "clcs-21-choice-1-same-named-choices")
+                 (:file "clcs-22-choice-2-excuse")))
    (:module "04-restarts"
-    :components ())
+    :components ((:file "clcs-23-lets-meet-kate-and-mark-again")
+                 (:file "clcs-24-restart-1-escape-through-front-door")
+                 (:file "clcs-25-restart-1-escape-through-both-doors")
+                 (:file "clcs-26-restart-1-same-named-restarts")
+                 (:file "clcs-27-restart-2-excuse")
+                 (:file "clcs-28-restart-2-interactive-excuse")))
    (:module "05-reporting"
     :components ())
    (:module "06-warnings"
