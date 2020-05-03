@@ -41,17 +41,15 @@
                  (:file "clcs-26-restart-1-same-named-restarts")
                  (:file "clcs-27-restart-2-excuse")
                  (:file "clcs-28-restart-2-interactive-excuse")))
-   (:module "05-actually-restarting-restarts"
+   (:module "05-reporting"
     :components ())
-   (:module "06-reporting"
+   (:module "06-warnings"
     :components ())
-   (:module "07-warnings"
+   (:module "07-assertions"
     :components ())
-   (:module "08-assertions"
+   (:module "08-debugger"
     :components ())
-   (:module "09-debugger"
-    :components ())
-   (:module "10-implementing-clcs"
+   (:module "09-implementing-clcs"
     :components ())
    (:module "98-handler-case-star"
     :components ((:file "clcs-98-handler-case-star")))
