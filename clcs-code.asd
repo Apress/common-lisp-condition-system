@@ -27,4 +27,22 @@
                  (:file "clcs-14-exception-handling-1")
                  (:file "clcs-15-exception-handling-2")
                  (:file "clcs-16-protection-against-transfers-of-control")
-                 (:file "clcs-17-handler-clustering.lisp")))))
+                 (:file "clcs-17-handler-clustering")))
+   (:module "03-choices"
+    :components ())
+   (:module "04-restarts"
+    :components ())
+   (:module "05-reporting"
+    :components ())
+   (:module "06-warnings"
+    :components ())
+   (:module "07-assertions"
+    :components ())
+   (:module "08-debugger"
+    :components ())
+   (:module "09-implementing-clcs"
+    :components ())
+   (:module "98-handler-case-star"
+    :components ((:file "clcs-98-handler-case-star")))
+   (:module "99-macros-101"
+    :components ((:file "clcs-99-macros-101")))))
