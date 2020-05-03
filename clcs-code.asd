@@ -40,9 +40,11 @@
                  (:file "clcs-25-restart-1-escape-through-both-doors")
                  (:file "clcs-26-restart-1-same-named-restarts")
                  (:file "clcs-27-restart-2-excuse")
-                 (:file "clcs-28-restart-2-interactive-excuse")))
+                 (:file "clcs-28-restart-2-interactive-excuse")
+                 (:file "clcs-29-actually-restarting-restarts")
+                 (:file "clcs-30-custom-restart-invoking-functions")))
    (:module "05-reporting"
-    :components ())
+    :components ((:file "clcs-31-reporting-conditions.lisp")))
    (:module "06-warnings"
     :components ())
    (:module "07-assertions"
