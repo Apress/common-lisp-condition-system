@@ -61,4 +61,5 @@ CL-USER> (clcs-40-debugger-choosing-restarts:test)
 ;; Invoke restart number: 1                                    ; user input here
 ;;
 ;; ABORT restart invoked; returning to toplevel.
+
 |#

@@ -6,6 +6,7 @@
   :license  "MIT"
   :version "0.0.1"
   :serial t
+  :depends-on (#:trivial-custom-debugger)
   :components
   ((:module "00-dynavars"
     :components ((:file "clcs-00-dynamic-variables")))
@@ -56,7 +57,11 @@
     :components ((:file "clcs-37-debugger-reporting-condition")
                  (:file "clcs-38-debugger-reporting-condition-type")
                  (:file "clcs-39-debugger-reporting-restarts")
-                 (:file "clcs-40-debugger-choosing-restarts")))
+                 (:file "clcs-40-debugger-choosing-restarts")
+                 (:file "clcs-41-installing-custom-debugger")
+                 (:file "clcs-42-recursive-debugger")
+                 (:file "clcs-43-reducing-debugger-level")
+                 (:file "clcs-44-repl-in-debugger")))
    (:module "98-handler-case-star"
     :components ((:file "clcs-98-handler-case-star")))
    (:module "99-macros-101"
