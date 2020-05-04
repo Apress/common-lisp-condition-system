@@ -1,7 +1,7 @@
 ;;;; clcs-code.asd
 
 (asdf:defsystem #:clcs-code
-  :description "Companion code for the Common Lisp Condition System book"
+  :description "Companion code for \"The Common Lisp Condition System\""
   :author "Michał \"phoe\" Herda <phoe@disroot.org"
   :license  "MIT"
   :version "0.0.1"
