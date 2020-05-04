@@ -47,12 +47,12 @@
     :components ((:file "clcs-31-reporting-conditions")
                  (:file "clcs-32-reporting-restarts")))
    (:module "06-warnings"
-    :components ())
+    :components ((:file "clcs-33-warnings")))
    (:module "07-assertions"
-    :components ())
+    :components ((:file "clcs-34-assert")
+                 (:file "clcs-35-check-type")
+                 (:file "clcs-36-case-assertions")))
    (:module "08-debugger"
-    :components ())
-   (:module "09-implementing-clcs"
     :components ())
    (:module "98-handler-case-star"
     :components ((:file "clcs-98-handler-case-star")))
