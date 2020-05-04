@@ -53,7 +53,10 @@
                  (:file "clcs-35-check-type")
                  (:file "clcs-36-case-assertions")))
    (:module "08-debugger"
-    :components ())
+    :components ((:file "clcs-37-debugger-reporting-condition")
+                 (:file "clcs-38-debugger-reporting-condition-type")
+                 (:file "clcs-39-debugger-reporting-restarts")
+                 (:file "clcs-40-debugger-choosing-restarts")))
    (:module "98-handler-case-star"
     :components ((:file "clcs-98-handler-case-star")))
    (:module "99-macros-101"
