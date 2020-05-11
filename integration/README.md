@@ -54,7 +54,7 @@ For example, if we would like to wrap `cl:type-error` into a new PCS condition t
 
 (defmethod host-condition-to-pcs ((condition cl:type-error))
   (make-condition 'foreign-type-error
-                  :wrapped-condition condition
+                  :foreign-condition condition
                   :datum (cl:type-error-datum condition)
                   :expected-type (cl:type-error-expected-type condition)))
 ```
