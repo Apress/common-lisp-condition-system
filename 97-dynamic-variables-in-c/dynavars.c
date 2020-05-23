@@ -26,10 +26,10 @@
                      name,                            \
                      dynamic_struct_name(type, name)) \
 
-#define dynamic_cleanup_aux(type, name, struct, cleanup) \
-  void cleanup (struct * arg) {                          \
-    *((*arg).target) = (*arg).data;                      \
-  }                                                      \
+#define dynamic_cleanup_aux(type, name, struct_name, cleanup) \
+  void cleanup (struct_name * arg) {                          \
+    *((*arg).target) = (*arg).data;                           \
+  }                                                           \
 
 #define dynamic_cleanup_def(type, name)                 \
   dynamic_cleanup_aux(type,                             \
@@ -42,10 +42,10 @@
   dynamic_cleanup_def(type, name);     \
   type name = value                    \
 
-#define dynamic_bind_aux(type, name, value, stype, save, pop, var)      \
-  for(int var = 1; var;)                                                \
-    for(stype save __attribute__((cleanup(pop))) = {name, &name}; var;) \
-      for(name = value; var; var = 0)                                   \
+#define dynamic_bind_aux(type, name, value, struct_name, save, pop, var)      \
+  for(int var = 1; var;)                                                      \
+    for(struct_name save __attribute__((cleanup(pop))) = {name, &name}; var;) \
+      for(name = value; var; var = 0)                                         \
 
 #define dynamic_bind(type, name, value)               \
   dynamic_bind_aux(type,                              \
