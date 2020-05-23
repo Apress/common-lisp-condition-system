@@ -2,7 +2,7 @@
 
 (defpackage #:clcs-99-macros-101
   (:use #:cl)
-  (:export #:my-and #:test-1 #:test-2 #:test-3 #:test-4 #:test-5 #:test-6))
+  (:export #:my-and #:test-1a #:test-1b #:test-2 #:test-3 #:test-4 #:test-5 #:test-6))
 
 (in-package #:clcs-99-macros-101)
 
@@ -14,10 +14,10 @@
         ((null (rest forms)) (first forms))
         (t (list 'if (first forms) (cons 'my-and (rest forms))))))
 
-(defun test-1 ()
+(defun test-1a ()
   (macroexpand-1 '(my-and (= 0 (random 6)) (error "Bang!"))))
 
-(defun test-2 ()
+(defun test-1b ()
   (my-and (= 0 (random 6)) (error "Bang!")))
 
 #|
@@ -40,7 +40,7 @@ CL-USER> (clcs-99-macros-101:test-2)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; 02 - backquote notation
 
-(defun test-3 ()
+(defun test-2 ()
   (let ((values '(1 2 3)))
     (list '(funcall function values)
           `(funcall function values)
