@@ -63,9 +63,9 @@ int get_x() {
 }
 
 void rebind() {
-  dynamic_bind(int, x, 5) {
+  dynamic_bind(int, x, 42) {
     printf("before assignment: %d\n", get_x());
-    x = 222;
+    x = 24;
     printf("after assignment: %d\n", get_x());
   }
 }
