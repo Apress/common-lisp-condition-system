@@ -61,11 +61,10 @@ CL-USER> (clcs-99-macros-101:test-3)
 ;;; 03 - FOR with symbol capture
 
 (defmacro for-3 ((var start stop) &body body)
-  (let ((gstop (gensym)))
-    `(do ((,var ,start (1+ ,var))
-          (limit ,stop))
-         ((> ,var limit))
-       ,@body)))
+  `(do ((,var ,start (1+ ,var))
+        (limit ,stop))
+       ((> ,var limit))
+     ,@body))
 
 (defun test-3 ()
   (let ((limit 10))
