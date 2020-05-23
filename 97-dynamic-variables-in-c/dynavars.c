@@ -3,9 +3,6 @@
 #define dynamic_name_aux(type, name, postfix)           \
   __dynamic_ ## type ## _ ## name ## _ ## postfix ## __ \
 
-#define dynamic_struct_name(type, name) \
-  dynamic_name_aux(type, name, struct)  \
-
 #define dynamic_cleanup_name(type, name) \
   dynamic_name_aux(type, name, cleanup)  \
 
@@ -15,43 +12,24 @@
 #define dynamic_continue_name(type, name) \
   dynamic_name_aux(type, name, continue)  \
 
-#define dynamic_struct_aux(type, name, struct_name) \
-  typedef struct {                                  \
-    type data;                                      \
-    type * target;                                  \
-  } struct_name                                     \
+#define dynamic_var_aux(type, name, cleanup) \
+  void cleanup (type * arg) { name = *arg; } \
 
-#define dynamic_struct_def(type, name)                \
-  dynamic_struct_aux(type,                            \
-                     name,                            \
-                     dynamic_struct_name(type, name)) \
+#define dynamic_var(type, name, value)              \
+  type name = value;                                \
+  dynamic_var_aux(type,                             \
+                  name,                             \
+                  dynamic_cleanup_name(type, name)) \
 
-#define dynamic_cleanup_aux(type, name, struct_name, cleanup) \
-  void cleanup (struct_name * arg) {                          \
-    *((*arg).target) = (*arg).data;                           \
-  }                                                           \
-
-#define dynamic_cleanup_def(type, name)                 \
-  dynamic_cleanup_aux(type,                             \
-                      name,                             \
-                      dynamic_struct_name(type, name),  \
-                      dynamic_cleanup_name(type, name)) \
-
-#define dynamic_var(type, name, value) \
-  dynamic_struct_def(type, name);      \
-  dynamic_cleanup_def(type, name);     \
-  type name = value                    \
-
-#define dynamic_bind_aux(type, name, value, struct_name, save, pop, var)      \
-  for(int var = 1; var;)                                                      \
-    for(struct_name save __attribute__((cleanup(pop))) = {name, &name}; var;) \
-      for(name = value; var; var = 0)                                         \
+#define dynamic_bind_aux(type, name, value, save, pop, var)   \
+  for(int var = 1; var;)                                      \
+    for(type save __attribute__((cleanup(pop))) = name; var;) \
+      for(name = value; var; var = 0)                         \
 
 #define dynamic_bind(type, name, value)               \
   dynamic_bind_aux(type,                              \
                    name,                              \
                    value,                             \
-                   dynamic_struct_name(type, name),   \
                    dynamic_save_name(type, name),     \
                    dynamic_cleanup_name(type, name),  \
                    dynamic_continue_name(type, name)) \
