@@ -1,3 +1,3 @@
-#include "header/dynamic-bind-memcpy-version.h"
+#include "dynavars/dynamic-bind-memcpy-version.h"
 
-#include "include/simple-example.inc.c"
+#include "examples/simple-example.inc.c"

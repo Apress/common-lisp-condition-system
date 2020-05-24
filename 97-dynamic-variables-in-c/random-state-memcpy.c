@@ -1,3 +1,3 @@
-#include "header/dynamic-bind-memcpy-version.h"
+#include "dynavars/dynamic-bind-memcpy-version.h"
 
-#include "include/random-state.inc.c"
+#include "examples/random-state.inc.c"

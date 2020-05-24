@@ -1,3 +1,3 @@
-#include "header/dynamic-bind-implicit-stack-version.h"
+#include "dynavars/dynamic-bind-implicit-stack-version.h"
 
-#include "include/random-state.inc.c"
+#include "examples/random-state.inc.c"

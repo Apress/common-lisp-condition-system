@@ -1,3 +1,3 @@
-#include "header/dynamic-bind-implicit-stack-version.h"
+#include "dynavars/dynamic-bind-implicit-stack-version.h"
 
-#include "include/simple-example.inc.c"
+#include "examples/simple-example.inc.c"
