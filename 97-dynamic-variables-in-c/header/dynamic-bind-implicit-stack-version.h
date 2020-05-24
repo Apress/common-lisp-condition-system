@@ -1,4 +1,5 @@
-#include <stdio.h>
+#ifndef DYNAMIC_BIND_IMPLICIT_STACK_VERSION_H
+#define DYNAMIC_BIND_IMPLICIT_STACK_VERSION_H
 
 #define dynamic_name(type, name, postfix)               \
   __dynamic_ ## type ## _ ## name ## _ ## postfix ## __ \
@@ -25,23 +26,7 @@
                    dynamic_name(type, name, cleanup),  \
                    dynamic_name(type, name, continue)) \
 
-dynamic_var(int, x, 5);
+#define dynamic_ref(type, name) \
+  name                          \
 
-int get_x() {
-  return x;
-}
-
-void rebind() {
-  dynamic_bind(int, x, 42) {
-    printf("before assignment: %d\n", get_x());
-    x = 24;
-    printf("after assignment: %d\n", get_x());
-  }
-}
-
-int main(int argc, char** argv) {
-  printf("toplevel binding: %d\n", get_x());
-  rebind();
-  printf("toplevel binding: %d\n", get_x());
-  return 0;
-}
+#endif /* DYNAMIC_BIND_IMPLICIT_STACK_VERSION_H */
