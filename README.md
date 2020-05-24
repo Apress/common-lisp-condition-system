@@ -10,4 +10,4 @@ This system depends on [`trivial-custom-debugger`](https://github.com/phoe/trivi
 
 The code for the second part of the book has been adapted from the [Portable Condition System](https://github.com/phoe/portable-condition-system) and is therefore not included here. Please see the CLCS repository for an updated and extended version of the code included in the book.
 
-The original code for dynamic variables in C has been contributed by [Marco Heisig](https://github.com/marcoheisig) and [Michael Raskin](https://gitlab.common-lisp.net/mraskin).
+The original code for implementations of dynamic variables in C has been contributed by [Marco Heisig](https://github.com/marcoheisig), [Michael Raskin](https://gitlab.common-lisp.net/mraskin), and [Gilbert Baumann](http://clim.rocks/).
