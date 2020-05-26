@@ -1,10 +1,10 @@
-;;;; clcs-97-call-with-handler-restart.lisp
+;;;; clcs-96-call-with-handler-restart.lisp
 
-(defpackage #:clcs-97-call-with-handler-restart
+(defpackage #:clcs-96-call-with-handler-restart
   (:use #:cl)
   (:export #:test-1 #:test-2))
 
-(in-package #:clcs-97-call-with-handler-restart)
+(in-package #:clcs-96-call-with-handler-restart)
 
 (defun call-with-handler (thunk condition-type handler)
   (let ((lambda-form
@@ -42,10 +42,10 @@
 
 #|
 
-CL-USER> (clcs-97-call-with-handler-restart:test-1)
+CL-USER> (clcs-96-call-with-handler-restart:test-1)
 #<SIMPLE-ERROR "bar" {1008678E03}>
 
-CL-USER> (clcs-97-call-with-handler-restart:test-2)
+CL-USER> (clcs-96-call-with-handler-restart:test-2)
 42
 
 |#

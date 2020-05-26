@@ -62,9 +62,13 @@
                  (:file "clcs-42-recursive-debugger")
                  (:file "clcs-43-reducing-debugger-level")
                  (:file "clcs-44-repl-in-debugger")))
-   (:module "97-call-with-handler-restart"
-    :components ((:file "clcs-97-call-with-handler-restart")))
-   (:module "98-handler-case-star"
-    :components ((:file "clcs-98-handler-case-star")))
+   (:module "96-call-with-handler-restart"
+    :components ((:file "clcs-94-call-with-handler-restart")
+                 (:file "clcs-95-call-with-handler-restart-cached")))
+   (:module "97-handler-bind-star-case-star"
+    :components ((:file "clcs-96-handler-bind-star")
+                 (:file "clcs-97-handler-case-star")))
+   (:module "98-handler-bind-case"
+    :components ((:file "clcs-98-handler-bind-case")))
    (:module "99-macros-101"
     :components ((:file "clcs-99-macros-101")))))
