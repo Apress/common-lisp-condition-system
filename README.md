@@ -5,7 +5,7 @@ This repository accompanies [*The Common Lisp Condition System*](https://www.apr
 [comment]: #cover
 ![Cover image](9781484261330.jpg)
 
-The sources are split into sources for the first part of the book and the appendices (the [`Sources - TCLCS`](Sources - TCLCS) folder) and sources for Portable Condition System (PCS, the [`Sources - PCS`](Sources - PCS) folder). Note that the sources for PCS are for version 1.1.0 of the library; for pushing updates upstream, please see [the main repository of the project](https://github.com/phoe/portable-condition-system).
+The sources are split into sources for the first part of the book and the appendices (the [`Sources - TCLCS`](Sources%20%20TCLCS/) folder) and sources for Portable Condition System (PCS, the [`Sources - PCS`](Sources%20-%20PCS/) folder). Note that the sources for PCS are for version 1.1.0 of the library; for pushing updates upstream, please see [the main repository of the project](https://github.com/phoe/portable-condition-system).
 
 Download the files as a zip using the green button, or clone the repository to your machine using Git.
 
