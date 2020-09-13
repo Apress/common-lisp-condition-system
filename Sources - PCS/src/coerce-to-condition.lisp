@@ -43,10 +43,10 @@ function as its format control and ARGUMENTS as format arguments."
                   :format-arguments arguments))
 
 (defmethod coerce-to-condition (datum arguments default-type name)
-  "Signals an error that the provided datum is not coercable to a condition
+  "Signals an error that the provided datum is not coercible to a condition
 object."
   (error 'simple-type-error
          :datum datum
          :expected-type '(or condition symbol function string)
-         :format-control "~S is not coercable to a condition."
+         :format-control "~S is not coercible to a condition."
          :format-arguments (list datum)))
