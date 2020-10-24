@@ -11,6 +11,13 @@ The [`Appendix E`](Appendix%20E) folder contains **Appendix E - Discussing the C
 
 Download the files as a zip using the green button, or clone the repository to your machine using Git.
 
+## Online discussions about the book
+
+* [2020-07-15 - Hacker News](https://news.ycombinator.com/item?id=23843525)
+* [2020-10-23 - Hacker News](https://news.ycombinator.com/item?id=24867548)
+
+(If you're aware of any other discussions, please feel free to make a PR and add it.)
+
 ## Releases
 
 Release v1.0 corresponds to the code in the published book, without corrections or updates.
