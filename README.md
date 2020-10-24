@@ -25,4 +25,4 @@ Appendix E as a whole is licensed under the CC0 license and placed in the public
 
 ## Contributions
 
-See the file Contributing.md for more information on how you can contribute to this repository.
+See the file [Contributing.md](Contributing.md) for more information on how you can contribute to this repository.
