@@ -81,7 +81,7 @@ The section describing the downsides of the condition system's introspection fac
 
 The section describing smaller issues contains a link to a Git commit that removes conditions from the Rust programming language, along with some rationale in the commit message. This commit is available at https://github.com/rust-lang/rust/commit/454882dcb7fdb03867d695a88335e2d2c8f7561a.
 
-The section summarizing the downsides of the Common Lisp condition system links to *What Made Lisp Different*, an essay by Paul Graham describing the aspects of Common Lisp which have not trickled into programming languages nowadays considered mainstream. This article is available at `http://www.paulgraham.com/diff.html` and the condition system would be a good addition to that list.
+The section summarizing the downsides of the Common Lisp condition system links to *What Made Lisp Different*, an essay by Paul Graham describing the aspects of Common Lisp which have not trickled into programming languages nowadays considered mainstream. This article is available at http://www.paulgraham.com/diff.html and the condition system would be a good addition to that list.
 
 The above section also contains condition systems implemented as libraries for other programming languages:
 * Python - https://github.com/svetlyak40wt/python-cl-conditions,
